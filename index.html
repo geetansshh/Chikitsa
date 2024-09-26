@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chikitsa - Your Health, Our Priority</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <span class="logo-text">Chikitsa</span>
+                    <div class="logo-icon"></div>
+                </div>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#doctors">Doctors</a></li>
+                    <li><a href="booked_appointments.html">Appointments</a></li>
+                    <li><a href="status.html">status</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <!-- <li><a href="#booked-appointments">Booked Appointments</a></li> -->
+                    <li><a href="#chat" class="chat-btn">Chat</a></li>
+                </ul>
+                <div class="menu-btn">☰</div>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="section">
+        <div class="container">
+            <h1>Welcome to Chikitsa</h1>
+            <p>Your health, our priority. Book appointments with top doctors easily.</p>
+            <a href="#doctors" class="btn">Book Appointment</a>
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <div class="container">
+            <h2 class="section-title">About Us</h2>
+            <p>
+                Chikitsa is your trusted platform for booking doctor appointments and addressing medical queries. We connect patients with skilled healthcare professionals across various specialties. Our platform features a medical chatbot that can be used by both patients and healthcare providers to answer queries about medical conditions, offering instant support and guidance. With Chikitsa, you can easily search for doctors, book appointments, and access reliable health information—all in one convenient place.</p>
+        </div>
+    </section>
+
+    <section id="services" class="section">
+        <div class="container">
+            <h2 class="section-title">Our Services</h2>
+            <div class="services-list">
+                <div class="service-item">
+                    <h3>Expert Doctors</h3>
+                    <p>Connect with experienced specialists in various fields of medicine.</p>
+                </div>
+                <div class="service-item">
+                    <h3>Easy Booking</h3>
+                    <p>Book appointments quickly and conveniently through our platform.</p>
+                </div>
+                <div class="service-item">
+                    <h3>AI Chat Support</h3>
+                    <p>Get instant answers to your health queries with our AI chatbot.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="doctors" class="section">
+        <div class="container">
+            <h2 class="section-title">Our Doctors</h2>
+            <div class="search-container">
+                <input type="text" id="doctor-search" placeholder="Search for a doctor or specialty...">
+            </div>
+            <div class="doctor-categories">
+                <!-- Doctor categories will be dynamically added here -->
+            </div>
+            <button id="view-more" class="btn">View More</button>
+            <button id="view-Less" class="btn" style="display: none;">View Less</button>
+        </div>
+    </section>
+
+    <section id="chat" class="section">
+        <div class="container">
+            <h2 class="section-title">Chat with Our AI Assistant</h2>
+            <p>Have questions? Get instant answers from our AI-powered chatbot.</p>
+            <a href="chat.html" class="btn">Start Chat</a>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-info" style="display: flex; justify-content: space-around; text-align: center;">
+                <!-- Person 1 -->
+                <div class="contact-person">
+                    <img src="geetansh.jpeg" alt="Person 1" style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 10px;">
+                    <p>
+                        <a href="mailto:yadavgeetansh007@gmail.com" style="text-decoration: none; color: #000; font-size: 18px;">
+                            Geetansh
+                        </a>
+                    </p>
+                    <p>Email: yadavgeetansh007@gmail.com</p>
+                </div>
+                
+                <!-- Person 2 -->
+                <div class="contact-person">
+                    <img src="anda.jpeg" alt="Person 2" style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 10px;">
+                    <p>
+                        <a href="mailto:mansh803202@gmail.com" style="text-decoration: none; color: #000; font-size: 18px;">
+                            Himanshu
+                        </a>
+                    </p>
+                    <p>Email: mansh803202@gmail.com</p>
+                </div>
+                
+                <!-- Person 3 -->
+                <div class="contact-person">
+                    <img src="mukund.jpeg" alt="Person 3" style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 10px;">
+                    <p>
+                        <a href="mailto:mukundagarwalla2002@gmail.com" style="text-decoration: none; color: #000; font-size: 18px;">
+                            Mukund
+                        </a>
+                    </p>
+                    <p>Email: mukundagarwalla2002@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Chikitsa. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

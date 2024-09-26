@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Confirmation - Chikitsa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #3a7bd5;
+            --secondary-color: #00d2ff;
+            --text-color: #333;
+            --bg-color: #f0f4f8;
+            --white: #ffffff;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 36px;
+        }
+
+        #receipt {
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Appointment Confirmation</h1>
+        <div id="receipt">
+            <h2>Appointment Details</h2>
+            <p><strong>Doctor:</strong> Dr. <span id="confirmedDoctorName"></span></p>
+            <p><strong>Clinic:</strong> <span id="confirmedClinicAddress"></span></p>
+            <p><strong>Appointment Time:</strong> <span id="confirmedAppointmentTime"></span></p>
+            <p><strong>Fee:</strong> <span id="confirmedAppointmentFee"></span></p>
+        </div>
+        <a href="index.html" class="btn">Go Back to Doctors</a>
+    </div>
+
+    <script>
+        // Sample data (you would replace this with actual data passed to the page)
+        const appointmentData = {
+            doctorName: "John Smith",
+            clinicAddress: "123 Health St, Medical City",
+            appointmentTime: "10:00",
+            appointmentFee: "$100"
+        };
+
+        // Populate appointment details
+        document.getElementById('confirmedDoctorName').textContent = appointmentData.doctorName;
+        document.getElementById('confirmedClinicAddress').textContent = appointmentData.clinicAddress;
+        document.getElementById('confirmedAppointmentTime').textContent = appointmentData.appointmentTime;
+        document.getElementById('confirmedAppointmentFee').textContent = appointmentData.appointmentFee;
+    </script>
+</body>
+</html>

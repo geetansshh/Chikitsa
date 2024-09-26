@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Practitioners - Chikitsa</title>
+   <link rel="stylesheet" href="general-practitioners.css">
+</head>
+<body>
+    <div class="container">
+        <h1>General Practitioners</h1>
+        <div class="search-container">
+            <input type="text" id="doctor-search" placeholder="Search for a doctor...">
+        </div>
+        <div id="doctor-list" class="doctor-list"></div>
+    </div>
+
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Book Appointment</h2>
+            <p id="modalDoctorName"></p>
+            <p id="modalClinicAddress"></p>
+            <p id="modalAppointmentFee"></p>
+            <h3>Available Time Slots</h3>
+            <div id="timeSlots" class="time-slots"></div>
+            <button id="confirmAppointment" class="btn">Confirm Appointment</button>
+        </div>
+    </div>
+
+    <script src="general-practitioners.js"></script>
+</body>
+</html>
