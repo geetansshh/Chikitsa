@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: chikitsa-postgres
+    environment:
+      POSTGRES_DB: chikitsa_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chikitsa-network
+
+  backend:
+    build: ./chikitsa_backend
+    container_name: chikitsa-backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./chikitsa_backend:/backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/chikitsa_db
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - DEBUG=True
+    depends_on:
+      - postgres
+    networks:
+      - chikitsa-network
+
+  frontend:
+    build: ./chikitsa_frontend
+    container_name: chikitsa-frontend
+    volumes:
+      - ./chikitsa_frontend:/frontend
+      - /frontend/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - chikitsa-network
+
+volumes:
+  postgres_data:
+
+networks:
+  chikitsa-network:
+    driver: bridge
