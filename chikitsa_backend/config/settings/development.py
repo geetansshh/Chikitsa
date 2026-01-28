@@ -11,13 +11,8 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 # CORS - Allow all origins in development
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Database - Use SQLite for development
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Database
+# Use DATABASE_URL from environment (falls back to sqlite in base.py)
 
 # Email - Use console backend in development
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
