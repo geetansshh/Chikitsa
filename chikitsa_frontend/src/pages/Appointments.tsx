@@ -15,7 +15,6 @@ import { PageLoading } from '@/components/ui/LoadingSpinner'
 import {
   CalendarDaysIcon,
   ClockIcon,
-  MapPinIcon,
   XMarkIcon,
   ExclamationCircleIcon,
   StarIcon,
@@ -105,7 +104,7 @@ export default function Appointments() {
   })
 
   // Payment mutation
-  const paymentMutation = useMutation({
+  useMutation({
     mutationFn: (id: string) => appointmentsAPI.payForAppointment(id, 'card'),
     onSuccess: () => {
       toast.success('Payment successful! Appointment confirmed.')
@@ -160,14 +159,18 @@ export default function Appointments() {
     // Extract doctor ID from appointment
     const doctorId = selectedAppointment.doctor?.id || selectedAppointment.doctor_id
     
-    reviewMutation.mutate({
-      doctorId,
-      data: {
-        rating: reviewRating,
-        title: reviewTitle,
-        comment: reviewComment,
-      },
-    })
+    if (doctorId) {
+      reviewMutation.mutate({
+        doctorId,
+        data: {
+          rating: reviewRating,
+          title: reviewTitle,
+          comment: reviewComment,
+        },
+      })
+    } else {
+      toast.error('Could not find doctor information')
+    }
   }
   
   const confirmCancel = () => {
@@ -320,15 +323,17 @@ export default function Appointments() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleCancelClick(appointment)}
-                              leftIcon={<XMarkIcon className="w-4 h-4" />}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() =>
-                                (window.location.href = `/doctors/${appointment.doctor.id}`)
+                            {appointment.doctor && (
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() =>
+                                  (window.location.href = `/doctors/${appointment.doctor.id}`)
+                                }
+                              >
+                                Reschedule
+                              </Button>
+                            )}ow.location.href = `/doctors/${appointment.doctor.id}`)
                               }
                             >
                               Reschedule

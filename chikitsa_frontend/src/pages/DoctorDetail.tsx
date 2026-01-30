@@ -73,9 +73,9 @@ export default function DoctorDetail() {
       time_slot: string
       patient_symptoms?: string
     }) => appointmentsAPI.createAppointment(data),
-    onSuccess: async (response) => {
+    onSuccess: async (response: any) => {
       // The response.data contains the appointment object directly
-      const appointmentId = response.data?.id || response?.id
+      const appointmentId = response.data?.id || response?.id || (response as any)?.id
       
       if (!appointmentId) {
         console.error('No appointment ID in response:', response)
