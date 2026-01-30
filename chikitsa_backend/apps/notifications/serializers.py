@@ -3,7 +3,7 @@ Serializers for notifications app.
 """
 
 from rest_framework import serializers
-from .models import Notification, NotificationPreference
+from .models import Notification
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -20,16 +20,3 @@ class NotificationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at']
 
-
-class NotificationPreferenceSerializer(serializers.ModelSerializer):
-    """
-    Serializer for NotificationPreference model.
-    """
-    
-    class Meta:
-        model = NotificationPreference
-        fields = [
-            'email_appointment_reminders', 'email_appointment_updates',
-            'email_marketing', 'push_enabled', 'push_appointment_reminders',
-            'push_new_messages', 'sms_enabled', 'sms_appointment_reminders'
-        ]

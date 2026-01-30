@@ -11,11 +11,7 @@ from .serializers import (
     UserSerializer,
     UserProfileUpdateSerializer,
     ChangePasswordSerializer,
-    PatientProfileSerializer,
-    PatientProfileUpdateSerializer,
 )
-from .models import PatientProfile
-from apps.core.permissions import IsOwner
 
 User = get_user_model()
 
@@ -61,23 +57,6 @@ class ChangePasswordView(APIView):
             {'message': 'Password updated successfully'},
             status=status.HTTP_200_OK
         )
-
-
-class PatientProfileView(generics.RetrieveUpdateAPIView):
-    """
-    GET: Get patient profile
-    PUT/PATCH: Update patient profile
-    """
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_object(self):
-        profile, _ = PatientProfile.objects.get_or_create(user=self.request.user)
-        return profile
-    
-    def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
-            return PatientProfileUpdateSerializer
-        return PatientProfileSerializer
 
 
 class UserListView(generics.ListAPIView):

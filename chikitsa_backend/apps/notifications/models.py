@@ -57,35 +57,3 @@ class Notification(TimeStampedModel):
             self.is_read = True
             self.read_at = timezone.now()
             self.save(update_fields=['is_read', 'read_at'])
-
-
-class NotificationPreference(TimeStampedModel):
-    """
-    User notification preferences.
-    """
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='notification_preferences'
-    )
-    
-    # Email notifications
-    email_appointment_reminders = models.BooleanField(default=True)
-    email_appointment_updates = models.BooleanField(default=True)
-    email_marketing = models.BooleanField(default=False)
-    
-    # Push notifications
-    push_enabled = models.BooleanField(default=True)
-    push_appointment_reminders = models.BooleanField(default=True)
-    push_new_messages = models.BooleanField(default=True)
-    
-    # SMS notifications
-    sms_enabled = models.BooleanField(default=False)
-    sms_appointment_reminders = models.BooleanField(default=True)
-    
-    class Meta:
-        verbose_name = _('notification preference')
-        verbose_name_plural = _('notification preferences')
-    
-    def __str__(self):
-        return f'Preferences for {self.user.email}'

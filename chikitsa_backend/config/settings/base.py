@@ -51,14 +51,11 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'django_filters',
-    'drf_spectacular',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'dj_rest_auth',
     'dj_rest_auth.registration',
-    'django_celery_results',
-    'django_celery_beat',
 ]
 
 LOCAL_APPS = [
@@ -170,7 +167,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.StandardResultsSetPagination',
     'PAGE_SIZE': 10,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
@@ -226,38 +222,8 @@ CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
 ])
 CORS_ALLOW_CREDENTIALS = True
 
-# Celery Configuration
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
-# DRF Spectacular (API Documentation)
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Chikitsa API',
-    'DESCRIPTION': 'Healthcare Platform API - Connecting patients with healthcare professionals',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SCHEMA_PATH_PREFIX': '/api/v1/',
-    'SWAGGER_UI_SETTINGS': {
-        'deepLinking': True,
-        'persistAuthorization': True,
-    },
-}
-
-# OpenAI / LangChain Configuration
-OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
-LANGCHAIN_TRACING_V2 = env.bool('LANGCHAIN_TRACING_V2', default=False)
-LANGCHAIN_API_KEY = env('LANGCHAIN_API_KEY', default='')
-
 # Chatbot Configuration
 CHATBOT_CONFIG = {
-    # Use Groq API (True) or fallback to OpenAI (False)
-    'USE_GROQ': env.bool('USE_GROQ', default=True),
     'MODEL_NAME': env('CHATBOT_MODEL', default='llama-3.3-70b-versatile'),
     'TEMPERATURE': 0.7,
     'MAX_TOKENS': 512,
@@ -267,6 +233,9 @@ CHATBOT_CONFIG = {
     Always recommend consulting a healthcare professional for specific medical advice.
     Be empathetic, clear, and professional in your responses.""",
 }
+
+# Doctor verification toggle
+REQUIRE_DOCTOR_VERIFICATION = env.bool('REQUIRE_DOCTOR_VERIFICATION', default=False)
 
 # Email Configuration
 EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')

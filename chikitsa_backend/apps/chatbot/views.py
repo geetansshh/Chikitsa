@@ -3,23 +3,13 @@ Views for chatbot app.
 """
 
 import uuid
-from rest_framework import generics, status, permissions
+from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.conf import settings
-from asgiref.sync import async_to_sync
 
-from .models import Conversation, Message, ChatbotFeedback
-from .serializers import (
-    ConversationListSerializer,
-    ConversationDetailSerializer,
-    ChatMessageInputSerializer,
-    ChatMessageOutputSerializer,
-    SymptomAnalysisInputSerializer,
-    ChatbotFeedbackSerializer,
-    HealthTipSerializer,
-)
-from .services import get_chatbot_service, get_symptom_analyzer, get_health_tips_service
+from .models import Conversation, Message
+from .serializers import ChatMessageInputSerializer
+from .services import get_chatbot_service
 
 
 class ChatView(APIView):
@@ -115,133 +105,4 @@ class ChatView(APIView):
         if hasattr(user, 'gender') and user.gender:
             context['gender'] = user.gender
         
-        if hasattr(user, 'patient_profile'):
-            profile = user.patient_profile
-            if profile.medical_conditions:
-                context['medical_conditions'] = profile.medical_conditions
-            if profile.allergies:
-                context['allergies'] = profile.allergies
-        
         return context if context else None
-
-
-class ConversationListView(generics.ListAPIView):
-    """
-    List user's conversations.
-    """
-    serializer_class = ConversationListSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return Conversation.objects.filter(
-            user=self.request.user,
-            is_deleted=False
-        ).prefetch_related('messages')
-
-
-class ConversationDetailView(generics.RetrieveDestroyAPIView):
-    """
-    Get or delete a conversation.
-    """
-    serializer_class = ConversationDetailSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return Conversation.objects.filter(user=self.request.user)
-    
-    def destroy(self, request, *args, **kwargs):
-        """Soft delete the conversation."""
-        instance = self.get_object()
-        instance.delete()  # Uses soft delete from BaseModel
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class SymptomAnalysisView(APIView):
-    """
-    Analyze symptoms and provide possible conditions.
-    """
-    permission_classes = [permissions.AllowAny]
-    
-    def post(self, request):
-        serializer = SymptomAnalysisInputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        analyzer = get_symptom_analyzer()
-        
-        try:
-            result = analyzer.analyze_symptoms(
-                symptoms=serializer.validated_data['symptoms'],
-                duration=serializer.validated_data['duration'],
-                severity=serializer.validated_data['severity'],
-                additional_info=serializer.validated_data.get('additional_info')
-            )
-            
-            return Response(result, status=status.HTTP_200_OK)
-        
-        except Exception as e:
-            return Response(
-                {
-                    'error': 'Failed to analyze symptoms. Please try again.',
-                    'disclaimer': 'If you have concerning symptoms, please consult a healthcare professional.'
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class HealthTipView(APIView):
-    """
-    Get personalized health tips.
-    """
-    permission_classes = [permissions.AllowAny]
-    
-    def get(self, request):
-        category = request.query_params.get('category', 'general')
-        
-        tips_service = get_health_tips_service()
-        
-        try:
-            tip = tips_service.get_daily_health_tip(category)
-            
-            return Response({
-                'category': category,
-                'tip': tip
-            }, status=status.HTTP_200_OK)
-        
-        except Exception as e:
-            return Response(
-                {'error': 'Failed to get health tip'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class ChatFeedbackView(generics.CreateAPIView):
-    """
-    Submit feedback for a chatbot response.
-    """
-    serializer_class = ChatbotFeedbackSerializer
-    permission_classes = [permissions.AllowAny]
-    
-    def perform_create(self, serializer):
-        serializer.save(
-            user=self.request.user if self.request.user.is_authenticated else None
-        )
-
-
-class QuickRepliesView(APIView):
-    """
-    Get suggested quick replies based on context.
-    """
-    permission_classes = [permissions.AllowAny]
-    
-    def get(self, request):
-        """Return common health-related quick replies."""
-        quick_replies = [
-            {"text": "Common cold symptoms", "value": "What are the symptoms of a common cold?"},
-            {"text": "Headache remedies", "value": "What are some home remedies for headache?"},
-            {"text": "When to see a doctor", "value": "When should I see a doctor?"},
-            {"text": "Healthy diet tips", "value": "Can you give me some healthy diet tips?"},
-            {"text": "Sleep improvement", "value": "How can I improve my sleep quality?"},
-            {"text": "Stress management", "value": "What are some stress management techniques?"},
-        ]
-        
-        return Response({'quick_replies': quick_replies})

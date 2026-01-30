@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
 
-from .models import Notification, NotificationPreference
-from .serializers import NotificationSerializer, NotificationPreferenceSerializer
+from .models import Notification
+from .serializers import NotificationSerializer
 
 
 class NotificationListView(generics.ListAPIView):
@@ -69,16 +69,3 @@ class MarkAllReadView(APIView):
         
         return Response({'message': 'All notifications marked as read'})
 
-
-class NotificationPreferenceView(generics.RetrieveUpdateAPIView):
-    """
-    Get or update notification preferences.
-    """
-    serializer_class = NotificationPreferenceSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_object(self):
-        preference, _ = NotificationPreference.objects.get_or_create(
-            user=self.request.user
-        )
-        return preference

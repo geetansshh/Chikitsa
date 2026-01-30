@@ -4,7 +4,6 @@ djangorestframework>=3.14.0
 django-cors-headers>=4.3.0
 django-filter>=23.5
 django-environ>=0.11.2
-django-debug-toolbar>=4.2.0
 
 # Database
 psycopg2-binary>=2.9.9
@@ -17,22 +16,7 @@ dj-rest-auth>=5.0.2
 
 # LangChain & AI
 langchain>=0.1.0
-langchain-openai>=0.0.5
-langchain-community>=0.0.20
 langchain-groq>=0.1.0
-openai>=1.10.0
-tiktoken>=0.5.2
-chromadb>=0.4.22
-sentence-transformers>=2.3.1
-
-# Async & Task Queue
-celery>=5.3.6
-redis>=5.0.1
-django-celery-results>=2.5.1
-django-celery-beat>=2.5.0
-
-# API Documentation
-drf-spectacular>=0.27.1
 
 # Utilities
 python-dotenv>=1.0.0
@@ -52,7 +36,3 @@ isort>=5.13.0
 flake8>=7.0.0
 mypy>=1.8.0
 django-stubs>=4.2.7
-
-# Security
-django-csp>=3.8
-django-ratelimit>=4.1.0

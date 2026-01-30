@@ -3,7 +3,7 @@ Admin configuration for chatbot app.
 """
 
 from django.contrib import admin
-from .models import Conversation, Message, MedicalKnowledgeBase, ChatbotFeedback
+from .models import Conversation, Message
 
 
 @admin.register(Conversation)
@@ -25,16 +25,3 @@ class MessageAdmin(admin.ModelAdmin):
         return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
     content_preview.short_description = 'Content'
 
-
-@admin.register(MedicalKnowledgeBase)
-class MedicalKnowledgeBaseAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'is_verified', 'is_active', 'created_at']
-    list_filter = ['category', 'is_verified', 'is_active']
-    search_fields = ['title', 'content']
-
-
-@admin.register(ChatbotFeedback)
-class ChatbotFeedbackAdmin(admin.ModelAdmin):
-    list_display = ['message', 'user', 'rating', 'feedback_type', 'created_at']
-    list_filter = ['rating', 'feedback_type', 'created_at']
-    raw_id_fields = ['message', 'user']

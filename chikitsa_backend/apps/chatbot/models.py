@@ -68,10 +68,6 @@ class Message(TimeStampedModel):
     model_used = models.CharField(max_length=50, blank=True)
     response_time_ms = models.PositiveIntegerField(default=0)
     
-    # Feedback
-    is_helpful = models.BooleanField(null=True, blank=True)
-    feedback_text = models.TextField(blank=True)
-    
     class Meta:
         verbose_name = _('message')
         verbose_name_plural = _('messages')
@@ -79,76 +75,3 @@ class Message(TimeStampedModel):
     
     def __str__(self):
         return f'{self.role}: {self.content[:50]}...'
-
-
-class MedicalKnowledgeBase(TimeStampedModel):
-    """
-    Knowledge base entries for RAG (Retrieval-Augmented Generation).
-    Medical information that the chatbot can reference.
-    """
-    
-    class Category(models.TextChoices):
-        SYMPTOM = 'symptom', _('Symptom')
-        CONDITION = 'condition', _('Condition')
-        MEDICATION = 'medication', _('Medication')
-        PROCEDURE = 'procedure', _('Procedure')
-        GENERAL = 'general', _('General Health')
-    
-    title = models.CharField(max_length=200)
-    category = models.CharField(
-        max_length=20,
-        choices=Category.choices,
-        default=Category.GENERAL
-    )
-    content = models.TextField()
-    source = models.CharField(max_length=200, blank=True)
-    source_url = models.URLField(blank=True)
-    
-    # Vector embedding for similarity search
-    embedding = models.JSONField(null=True, blank=True)
-    
-    is_verified = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    
-    class Meta:
-        verbose_name = _('medical knowledge base')
-        verbose_name_plural = _('medical knowledge bases')
-        ordering = ['category', 'title']
-    
-    def __str__(self):
-        return f'{self.category}: {self.title}'
-
-
-class ChatbotFeedback(TimeStampedModel):
-    """
-    User feedback on chatbot responses.
-    """
-    message = models.ForeignKey(
-        Message,
-        on_delete=models.CASCADE,
-        related_name='feedbacks'
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-    rating = models.PositiveIntegerField(help_text='1-5 rating')
-    feedback_type = models.CharField(
-        max_length=20,
-        choices=[
-            ('helpful', 'Helpful'),
-            ('not_helpful', 'Not Helpful'),
-            ('incorrect', 'Incorrect Information'),
-            ('inappropriate', 'Inappropriate'),
-        ]
-    )
-    comment = models.TextField(blank=True)
-    
-    class Meta:
-        verbose_name = _('chatbot feedback')
-        verbose_name_plural = _('chatbot feedbacks')
-    
-    def __str__(self):
-        return f'Feedback for message {self.message_id}'

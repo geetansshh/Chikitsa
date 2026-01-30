@@ -212,36 +212,11 @@ export const appointmentsAPI = {
 export const chatbotAPI = {
   sendMessage: (message: string, conversationId?: string) =>
     api.post('/chatbot/chat/', { message, conversation_id: conversationId }),
-  
-  getConversations: () => api.get('/chatbot/conversations/'),
-  
-  getConversation: (id: string) => api.get(`/chatbot/conversations/${id}/`),
-  
-  deleteConversation: (id: string) => api.delete(`/chatbot/conversations/${id}/`),
-  
-  analyzeSymptoms: (data: {
-    symptoms: string[]
-    duration: string
-    severity: string
-    additional_info?: string
-  }) => api.post('/chatbot/symptoms/analyze/', data),
-  
-  getHealthTip: (category?: string) =>
-    api.get('/chatbot/health-tips/', { params: { category } }),
-  
-  getQuickReplies: () => api.get('/chatbot/quick-replies/'),
-  
-  submitFeedback: (messageId: number, data: {
-    rating: number
-    feedback_type: string
-    comment?: string
-  }) => api.post('/chatbot/feedback/', { message: messageId, ...data }),
 }
 
 export const analyticsAPI = {
   getPatientDashboard: () => api.get('/analytics/dashboard/patient/'),
   getDoctorDashboard: () => api.get('/analytics/dashboard/doctor/'),
-  getAdminDashboard: () => api.get('/analytics/dashboard/admin/'),
 }
 
 export const notificationsAPI = {
@@ -249,7 +224,4 @@ export const notificationsAPI = {
   getUnreadCount: () => api.get('/notifications/unread-count/'),
   markAsRead: (id: number) => api.post(`/notifications/${id}/read/`),
   markAllRead: () => api.post('/notifications/read-all/'),
-  getPreferences: () => api.get('/notifications/preferences/'),
-  updatePreferences: (data: Record<string, boolean>) =>
-    api.patch('/notifications/preferences/', data),
 }

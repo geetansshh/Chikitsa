@@ -14,7 +14,6 @@ from .views import (
     AppointmentPaymentView,
     UpcomingAppointmentsView,
     PastAppointmentsView,
-    AppointmentDocumentListCreateView,
 )
 
 app_name = 'appointments'
@@ -34,7 +33,4 @@ urlpatterns = [
     # Filtered lists
     path('upcoming/', UpcomingAppointmentsView.as_view(), name='upcoming-appointments'),
     path('past/', PastAppointmentsView.as_view(), name='past-appointments'),
-    
-    # Documents
-    path('<uuid:appointment_id>/documents/', AppointmentDocumentListCreateView.as_view(), name='appointment-documents'),
 ]

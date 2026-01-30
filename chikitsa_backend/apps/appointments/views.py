@@ -10,7 +10,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django.utils import timezone
 from django.db.models import Q
 
-from .models import Appointment, AppointmentDocument
+from .models import Appointment
 from .serializers import (
     AppointmentListSerializer,
     AppointmentDetailSerializer,
@@ -18,11 +18,9 @@ from .serializers import (
     AppointmentUpdateSerializer,
     AppointmentCancelSerializer,
     AppointmentRescheduleSerializer,
-    AppointmentDocumentSerializer,
-    AppointmentDocumentUploadSerializer,
 )
 from .filters import AppointmentFilter
-from apps.core.permissions import IsOwner, IsDoctor, IsOwnerOrAdmin
+from apps.core.permissions import IsDoctor, IsOwnerOrAdmin
 
 
 class AppointmentListCreateView(generics.ListCreateAPIView):
@@ -111,6 +109,32 @@ class AppointmentCancelView(APIView):
         appointment.cancellation_reason = serializer.validated_data['reason']
         appointment.cancelled_at = timezone.now()
         appointment.save()
+
+        from apps.notifications.models import Notification
+        if user.is_doctor and hasattr(user, 'doctor_profile'):
+            Notification.objects.create(
+                user=appointment.patient,
+                notification_type=Notification.NotificationType.APPOINTMENT_CANCELLED,
+                title='Appointment cancelled by doctor',
+                message=(
+                    f'Dr. {appointment.doctor.user.full_name} cancelled your appointment on '
+                    f'{appointment.appointment_date} at {appointment.time_slot}.'
+                ),
+                related_object_type='appointment',
+                related_object_id=str(appointment.id)
+            )
+        else:
+            Notification.objects.create(
+                user=appointment.doctor.user,
+                notification_type=Notification.NotificationType.APPOINTMENT_CANCELLED,
+                title='Appointment cancelled by patient',
+                message=(
+                    f'{appointment.patient.full_name} cancelled the appointment on '
+                    f'{appointment.appointment_date} at {appointment.time_slot}.'
+                ),
+                related_object_type='appointment',
+                related_object_id=str(appointment.id)
+            )
         
         return Response(
             {'message': 'Appointment cancelled successfully'},
@@ -167,6 +191,19 @@ class AppointmentRescheduleView(APIView):
         appointment.time_slot = new_time_slot
         appointment.status = Appointment.Status.PENDING
         appointment.save()
+
+        from apps.notifications.models import Notification
+        Notification.objects.create(
+            user=appointment.doctor.user,
+            notification_type=Notification.NotificationType.SYSTEM,
+            title='Appointment rescheduled',
+            message=(
+                f'{appointment.patient.full_name} rescheduled the appointment from '
+                f'{old_date} at {old_time} to {new_date} at {new_time_slot}.'
+            ),
+            related_object_type='appointment',
+            related_object_id=str(appointment.id)
+        )
         
         return Response({
             'message': 'Appointment rescheduled successfully',
@@ -203,6 +240,19 @@ class AppointmentConfirmView(APIView):
         
         appointment.status = Appointment.Status.CONFIRMED
         appointment.save(update_fields=['status'])
+
+        from apps.notifications.models import Notification
+        Notification.objects.create(
+            user=appointment.patient,
+            notification_type=Notification.NotificationType.APPOINTMENT_CONFIRMED,
+            title='Appointment confirmed',
+            message=(
+                f'Dr. {appointment.doctor.user.full_name} confirmed your appointment on '
+                f'{appointment.appointment_date} at {appointment.time_slot}.'
+            ),
+            related_object_type='appointment',
+            related_object_id=str(appointment.id)
+        )
         
         return Response(
             {'message': 'Appointment confirmed successfully'},
@@ -210,61 +260,6 @@ class AppointmentConfirmView(APIView):
         )
 
 
-class AppointmentCompleteView(APIView):
-    """
-    Mark appointment as completed (Doctor only).
-    """
-    permission_classes = [permissions.IsAuthenticated, IsDoctor]
-    
-    def post(self, request, pk):
-        try:
-            try:
-                appointment = Appointment.objects.get(
-                    pk=pk,
-                    doctor=request.user.doctor_profile
-                )
-            except Appointment.DoesNotExist:
-                return Response(
-                    {'error': 'Appointment not found'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            if appointment.status == 'completed':
-                return Response(
-                    {'error': 'Appointment already completed'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Update appointment
-            appointment.status = 'completed'
-            appointment.doctor_notes = request.data.get('doctor_notes', appointment.doctor_notes)
-            appointment.prescription = request.data.get('prescription', appointment.prescription)
-            appointment.diagnosis = request.data.get('diagnosis', appointment.diagnosis)
-            appointment.save()
-            
-            # Send notification to patient for review
-            from apps.notifications.models import Notification
-            Notification.objects.create(
-                user=appointment.patient,
-                notification_type='appointment_completed',
-                title='How was your consultation?',
-                message=f'Please share your experience with Dr. {appointment.doctor.user.full_name}',
-                related_object_type='appointment',
-                related_object_id=str(appointment.id)
-            )
-            
-            return Response({
-                'message': 'Appointment marked as completed',
-                'appointment': AppointmentDetailSerializer(appointment).data
-            })
-        except Exception as e:
-            import traceback
-            print(f"Error in complete appointment: {str(e)}")
-            print(traceback.format_exc())
-            return Response(
-                {'error': f'Server error: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
 
 class UpcomingAppointmentsView(generics.ListAPIView):
@@ -437,27 +432,3 @@ class AppointmentPaymentView(APIView):
                 {'error': f'Payment processing failed: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-
-class AppointmentDocumentListCreateView(generics.ListCreateAPIView):
-    """
-    List or upload documents for an appointment.
-    """
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        appointment_id = self.kwargs['appointment_id']
-        return AppointmentDocument.objects.filter(appointment_id=appointment_id)
-    
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return AppointmentDocumentUploadSerializer
-        return AppointmentDocumentSerializer
-    
-    def perform_create(self, serializer):
-        appointment_id = self.kwargs['appointment_id']
-        appointment = Appointment.objects.get(id=appointment_id)
-        serializer.save(
-            appointment=appointment,
-            uploaded_by=self.request.user
-        )

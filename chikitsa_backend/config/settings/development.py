@@ -20,15 +20,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Disable throttling in development
 REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = []
 
-# Debug toolbar
-INSTALLED_APPS += ['debug_toolbar']
-MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
-INTERNAL_IPS = ['127.0.0.1']
-
-# Celery - Use synchronous execution in development
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True
-
 # Static files
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 

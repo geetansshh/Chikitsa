@@ -10,7 +10,6 @@ const footerLinks = {
     { name: 'Find Doctors', path: '/doctors' },
     { name: 'AI Health Assistant', path: '/chat' },
     { name: 'Book Appointments', path: '/appointments' },
-    { name: 'Health Tips', path: '/health-tips' },
   ],
   company: [
     { name: 'About Us', path: '/about' },

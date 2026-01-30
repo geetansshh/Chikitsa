@@ -3,6 +3,7 @@ Views for doctors app.
 """
 
 from rest_framework import generics, status, permissions, filters
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -51,19 +52,26 @@ class DoctorListView(generics.ListAPIView):
     ordering = ['-average_rating']
     
     def get_queryset(self):
-        return DoctorProfile.objects.filter(
-            is_verified=True,
+        queryset = DoctorProfile.objects.filter(
             is_accepting_patients=True
-        ).select_related('user', 'specialty')
+        )
+        if settings.REQUIRE_DOCTOR_VERIFICATION:
+            queryset = queryset.filter(is_verified=True)
+        return queryset.select_related('user', 'specialty')
 
 
 class DoctorDetailView(generics.RetrieveAPIView):
     """
     Get detailed doctor information.
     """
-    queryset = DoctorProfile.objects.filter(is_verified=True)
     serializer_class = DoctorDetailSerializer
     permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        queryset = DoctorProfile.objects.all()
+        if settings.REQUIRE_DOCTOR_VERIFICATION:
+            queryset = queryset.filter(is_verified=True)
+        return queryset
 
 
 class DoctorProfileView(generics.RetrieveUpdateAPIView):
