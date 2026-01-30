@@ -11,19 +11,13 @@ This follows SOLID principles:
 """
 
 import logging
-from typing import List, Dict, Any, Optional
-from datetime import datetime
-import time
 import os
-import asyncio
+import time
+from typing import Any, Dict, List, Optional
 
 from django.conf import settings
-from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTemplate
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +29,9 @@ class MedicalChatbotService:
     """
     
     def __init__(self):
-        self.model_name = settings.CHATBOT_CONFIG.get('MODEL_NAME', 'llama-3.1-70b-versatile')
+        self.model_name = settings.CHATBOT_CONFIG.get('MODEL_NAME', 'llama-3.3-70b-versatile')
         self.temperature = settings.CHATBOT_CONFIG.get('TEMPERATURE', 0.7)
         self.max_tokens = settings.CHATBOT_CONFIG.get('MAX_TOKENS', 512)
-        self.use_groq = settings.CHATBOT_CONFIG.get('USE_GROQ', True)
-        
         self._llm = None
         self._system_prompt = self._get_system_prompt()
     
@@ -47,24 +39,14 @@ class MedicalChatbotService:
     def llm(self):
         """Lazy initialization of LLM."""
         if self._llm is None:
-            if self.use_groq:
-                # Use Groq for fast inference with Llama models
-                groq_api_key = settings.CHATBOT_CONFIG.get('GROQ_API_KEY', 
-                                                             os.environ.get('GROQ_API_KEY'))
-                self._llm = ChatGroq(
-                    model=self.model_name,
-                    temperature=self.temperature,
-                    max_tokens=self.max_tokens,
-                    api_key=groq_api_key,
-                )
-            else:
-                # Fallback to OpenAI
-                self._llm = ChatOpenAI(
-                    model=self.model_name,
-                    temperature=self.temperature,
-                    max_tokens=self.max_tokens,
-                    api_key=settings.OPENAI_API_KEY,
-                )
+            groq_api_key = settings.CHATBOT_CONFIG.get('GROQ_API_KEY',
+                                                      os.environ.get('GROQ_API_KEY'))
+            self._llm = ChatGroq(
+                model=self.model_name,
+                temperature=self.temperature,
+                max_tokens=self.max_tokens,
+                api_key=groq_api_key,
+            )
         return self._llm
     
     
@@ -108,7 +90,7 @@ Remember: You are a health information assistant, not a replacement for professi
             elif msg['role'] == 'assistant':
                 formatted.append(AIMessage(content=msg['content']))
         return formatted
-    
+
     def _build_user_context_message(self, user_context: Dict[str, Any]) -> str:
         """Build context message from user information."""
         parts = ["User Context:"]
@@ -125,6 +107,7 @@ Remember: You are a health information assistant, not a replacement for professi
         if len(parts) > 1:
             return "\n".join(parts)
         return ""
+    
     
     async def generate_response(
         self,
@@ -233,118 +216,10 @@ Remember: You are a health information assistant, not a replacement for professi
                 'error': str(e)
             }
     
-    def _build_user_context_message(self, user_context: Dict[str, Any]) -> str:
-        """Build context message from user information."""
-        parts = ["User Context:"]
-        
-        if user_context.get('age'):
-            parts.append(f"- Age: {user_context['age']} years")
-        if user_context.get('gender'):
-            parts.append(f"- Gender: {user_context['gender']}")
-        if user_context.get('medical_conditions'):
-            parts.append(f"- Known conditions: {user_context['medical_conditions']}")
-        if user_context.get('allergies'):
-            parts.append(f"- Allergies: {user_context['allergies']}")
-        
-        if len(parts) > 1:
-            return "\n".join(parts)
-        return ""
-
-
-class SymptomAnalyzerService:
-    """
-    Specialized service for symptom analysis.
-    Uses a structured approach to gather and analyze symptoms.
-    """
-    
-    def __init__(self):
-        self.llm = ChatOpenAI(
-            model='gpt-4-turbo-preview',
-            temperature=0.3,  # Lower temperature for more consistent analysis
-            api_key=settings.OPENAI_API_KEY,
-        )
-    
-    def analyze_symptoms(
-        self,
-        symptoms: List[str],
-        duration: str,
-        severity: str,
-        additional_info: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """
-        Analyze symptoms and provide possible conditions.
-        
-        Returns structured information about possible conditions,
-        urgency level, and recommended actions.
-        """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are a medical symptom analyzer. Analyze the given symptoms and provide:
-1. Possible conditions (with confidence levels: likely, possible, unlikely)
-2. Urgency level (emergency, urgent, routine, self-care)
-3. Recommended actions
-4. Red flags to watch for
-5. Suggested questions for a doctor visit
-
-IMPORTANT: Always emphasize that this is informational only and not a diagnosis.
-Format your response as structured JSON."""),
-            ("human", """Analyze these symptoms:
-Symptoms: {symptoms}
-Duration: {duration}
-Severity: {severity}
-Additional Info: {additional_info}""")
-        ])
-        
-        chain = prompt | self.llm | StrOutputParser()
-        
-        result = chain.invoke({
-            'symptoms': ', '.join(symptoms),
-            'duration': duration,
-            'severity': severity,
-            'additional_info': additional_info or 'None provided'
-        })
-        
-        return {
-            'analysis': result,
-            'disclaimer': 'This analysis is for informational purposes only and does not constitute medical advice. Please consult a healthcare professional for proper diagnosis and treatment.'
-        }
-
-
-class HealthTipsService:
-    """
-    Service for generating personalized health tips.
-    """
-    
-    def __init__(self):
-        self.llm = ChatOpenAI(
-            model='gpt-3.5-turbo',  # Faster model for tips
-            temperature=0.8,
-            api_key=settings.OPENAI_API_KEY,
-        )
-    
-    def get_daily_health_tip(self, category: str = 'general') -> str:
-        """Get a daily health tip in the specified category."""
-        categories = {
-            'general': 'general wellness and health',
-            'nutrition': 'healthy eating and nutrition',
-            'exercise': 'physical fitness and exercise',
-            'mental': 'mental health and stress management',
-            'sleep': 'sleep hygiene and rest',
-        }
-        
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are a health and wellness expert. Provide practical, actionable health tips."),
-            ("human", f"Give me one helpful health tip about {categories.get(category, 'general health')}. Keep it concise (2-3 sentences) and actionable.")
-        ])
-        
-        chain = prompt | self.llm | StrOutputParser()
-        
-        return chain.invoke({})
 
 
 # Singleton instances
 _chatbot_service = None
-_symptom_analyzer = None
-_health_tips_service = None
 
 
 def get_chatbot_service() -> MedicalChatbotService:
@@ -353,19 +228,3 @@ def get_chatbot_service() -> MedicalChatbotService:
     if _chatbot_service is None:
         _chatbot_service = MedicalChatbotService()
     return _chatbot_service
-
-
-def get_symptom_analyzer() -> SymptomAnalyzerService:
-    """Get or create the symptom analyzer singleton."""
-    global _symptom_analyzer
-    if _symptom_analyzer is None:
-        _symptom_analyzer = SymptomAnalyzerService()
-    return _symptom_analyzer
-
-
-def get_health_tips_service() -> HealthTipsService:
-    """Get or create the health tips service singleton."""
-    global _health_tips_service
-    if _health_tips_service is None:
-        _health_tips_service = HealthTipsService()
-    return _health_tips_service

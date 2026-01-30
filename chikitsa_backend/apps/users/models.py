@@ -5,7 +5,6 @@ Custom user model with role-based access.
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import TimeStampedModel
@@ -123,46 +122,3 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     def is_admin(self):
         """Check if user is an admin."""
         return self.role == self.Role.ADMIN
-
-
-class PatientProfile(TimeStampedModel):
-    """
-    Extended profile for patients.
-    Contains medical history and preferences.
-    """
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='patient_profile'
-    )
-    
-    # Medical information
-    blood_group = models.CharField(
-        max_length=5,
-        choices=[
-            ('A+', 'A+'), ('A-', 'A-'),
-            ('B+', 'B+'), ('B-', 'B-'),
-            ('AB+', 'AB+'), ('AB-', 'AB-'),
-            ('O+', 'O+'), ('O-', 'O-'),
-        ],
-        blank=True
-    )
-    allergies = models.TextField(blank=True, help_text='Known allergies')
-    medical_conditions = models.TextField(blank=True, help_text='Existing medical conditions')
-    medications = models.TextField(blank=True, help_text='Current medications')
-    
-    # Emergency contact
-    emergency_contact_name = models.CharField(max_length=100, blank=True)
-    emergency_contact_phone = models.CharField(max_length=20, blank=True)
-    emergency_contact_relation = models.CharField(max_length=50, blank=True)
-    
-    # Insurance
-    insurance_provider = models.CharField(max_length=100, blank=True)
-    insurance_id = models.CharField(max_length=50, blank=True)
-    
-    class Meta:
-        verbose_name = _('patient profile')
-        verbose_name_plural = _('patient profiles')
-    
-    def __str__(self):
-        return f'Patient: {self.user.full_name}'

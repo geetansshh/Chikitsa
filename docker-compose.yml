@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:14
@@ -27,6 +25,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/chikitsa_db
       - GROQ_API_KEY=${GROQ_API_KEY}
       - CHATBOT_MODEL=${CHATBOT_MODEL}
+      - REQUIRE_DOCTOR_VERIFICATION=${REQUIRE_DOCTOR_VERIFICATION}
       - DEBUG=True
     depends_on:
       - postgres
@@ -37,12 +36,13 @@ services:
     build: ./chikitsa_frontend
     container_name: chikitsa-frontend
     volumes:
-      - ./chikitsa_frontend:/frontend
-      - /frontend/node_modules
+      - ./chikitsa_frontend:/chikitsa-frontend
+      - /chikitsa-frontend/node_modules
     ports:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost:8000/api/v1
+      - VITE_REQUIRE_DOCTOR_VERIFICATION=${REQUIRE_DOCTOR_VERIFICATION}
     depends_on:
       - backend
     networks:

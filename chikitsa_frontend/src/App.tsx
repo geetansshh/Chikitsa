@@ -11,6 +11,8 @@ import Profile from './pages/Profile'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Dashboard from './pages/Dashboard'
+import Unauthorized from './pages/Unauthorized'
+import DoctorPending from './pages/doctor/DoctorPending'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 
 // Doctor Pages
@@ -39,6 +41,7 @@ function RoleBasedRedirect() {
 function App() {
   return (
     <Routes>
+      <Route path="/doctor/pending" element={<DoctorPending />} />
       {/* Public Routes with main layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
@@ -47,6 +50,7 @@ function App() {
         <Route path="chat" element={<Chat />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="unauthorized" element={<Unauthorized />} />
         
         {/* Patient Protected Routes */}
         <Route path="dashboard" element={
@@ -86,6 +90,7 @@ function App() {
         <Route path="appointments" element={<DoctorAppointments />} />
         <Route path="schedule" element={<DoctorSchedule />} />
         <Route path="profile" element={<DoctorProfile />} />
+        <Route path="notifications" element={<Notifications />} />
       </Route>
     </Routes>
   )

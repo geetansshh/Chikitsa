@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, PatientProfile
+from .models import User
 
 
 @admin.register(User)
@@ -36,13 +36,3 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-
-@admin.register(PatientProfile)
-class PatientProfileAdmin(admin.ModelAdmin):
-    """
-    Admin for PatientProfile model.
-    """
-    list_display = ['user', 'blood_group', 'insurance_provider', 'created_at']
-    list_filter = ['blood_group']
-    search_fields = ['user__email', 'user__first_name', 'user__last_name']
-    raw_id_fields = ['user']

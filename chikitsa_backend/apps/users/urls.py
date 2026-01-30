@@ -8,7 +8,6 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     UserProfileView,
     ChangePasswordView,
-    PatientProfileView,
     UserListView,
 )
 
@@ -23,7 +22,6 @@ urlpatterns = [
     # Profile management
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('profile/change-password/', ChangePasswordView.as_view(), name='change-password'),
-    path('profile/patient/', PatientProfileView.as_view(), name='patient-profile'),
     
     # Admin
     path('users/', UserListView.as_view(), name='user-list'),

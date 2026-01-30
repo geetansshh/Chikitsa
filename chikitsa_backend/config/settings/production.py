@@ -4,8 +4,21 @@ Optimized for security and performance.
 """
 
 from .base import *
+import os
 
 DEBUG = False
+
+# Get ALLOWED_HOSTS from environment or use Render default
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '.onrender.com').split(',')
+
+# Get CORS origins from environment
+cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
+if cors_origins:
+    CORS_ALLOWED_ORIGINS = cors_origins.split(',')
+else:
+    CORS_ALLOWED_ORIGINS = []
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Security settings
 SECURE_SSL_REDIRECT = True
@@ -25,14 +38,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Database - Use PostgreSQL in production
 DATABASES = {
     'default': env.db('DATABASE_URL')
-}
-
-# Redis Cache
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': env('REDIS_URL', default='redis://localhost:6379/1'),
-    }
 }
 
 # Email - Use actual SMTP in production

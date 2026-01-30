@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 
-from apps.core.models import BaseModel, TimeStampedModel, ActiveManager, AllObjectsManager
+from apps.core.models import BaseModel, ActiveManager, AllObjectsManager
 from apps.doctors.models import DoctorProfile
 
 
@@ -99,18 +99,6 @@ class Appointment(BaseModel):
     cancellation_reason = models.TextField(blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     
-    # Rescheduling
-    rescheduled_from = models.ForeignKey(
-        'self',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='rescheduled_to'
-    )
-    
-    # Reminders
-    reminder_sent = models.BooleanField(default=False)
-    reminder_sent_at = models.DateTimeField(null=True, blank=True)
     
     # Managers
     objects = ActiveManager()
@@ -162,72 +150,3 @@ class Appointment(BaseModel):
         )
         # Can cancel up to 2 hours before appointment
         return appointment_datetime > timezone.now().replace(tzinfo=None) + timedelta(hours=2)
-
-
-class AppointmentDocument(TimeStampedModel):
-    """
-    Documents attached to appointments (reports, prescriptions, etc.)
-    """
-    
-    class DocumentType(models.TextChoices):
-        PRESCRIPTION = 'prescription', _('Prescription')
-        LAB_REPORT = 'lab_report', _('Lab Report')
-        MEDICAL_RECORD = 'medical_record', _('Medical Record')
-        IMAGING = 'imaging', _('Imaging')
-        OTHER = 'other', _('Other')
-    
-    appointment = models.ForeignKey(
-        Appointment,
-        on_delete=models.CASCADE,
-        related_name='documents'
-    )
-    document_type = models.CharField(
-        max_length=20,
-        choices=DocumentType.choices
-    )
-    title = models.CharField(max_length=200)
-    file = models.FileField(upload_to='appointment_documents/')
-    notes = models.TextField(blank=True)
-    uploaded_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    
-    class Meta:
-        verbose_name = _('appointment document')
-        verbose_name_plural = _('appointment documents')
-    
-    def __str__(self):
-        return f'{self.title} - {self.appointment}'
-
-
-class AppointmentReminder(TimeStampedModel):
-    """
-    Reminders for appointments.
-    """
-    
-    class ReminderType(models.TextChoices):
-        EMAIL = 'email', _('Email')
-        SMS = 'sms', _('SMS')
-        PUSH = 'push', _('Push Notification')
-    
-    appointment = models.ForeignKey(
-        Appointment,
-        on_delete=models.CASCADE,
-        related_name='reminders'
-    )
-    reminder_type = models.CharField(
-        max_length=10,
-        choices=ReminderType.choices
-    )
-    scheduled_at = models.DateTimeField()
-    sent_at = models.DateTimeField(null=True, blank=True)
-    is_sent = models.BooleanField(default=False)
-    
-    class Meta:
-        verbose_name = _('appointment reminder')
-        verbose_name_plural = _('appointment reminders')
-    
-    def __str__(self):
-        return f'Reminder for {self.appointment}'

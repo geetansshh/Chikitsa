@@ -4,6 +4,7 @@ Serializers for doctors app.
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from .models import Specialty, DoctorProfile, DoctorSchedule, DoctorLeave, DoctorReview
 
@@ -21,7 +22,10 @@ class SpecialtySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'description', 'icon', 'doctor_count']
     
     def get_doctor_count(self, obj):
-        return obj.doctors.filter(is_verified=True, is_deleted=False).count()
+        queryset = obj.doctors.filter(is_deleted=False)
+        if settings.REQUIRE_DOCTOR_VERIFICATION:
+            queryset = queryset.filter(is_verified=True)
+        return queryset.count()
 
 
 class DoctorUserSerializer(serializers.ModelSerializer):

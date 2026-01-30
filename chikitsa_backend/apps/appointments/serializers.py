@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.utils import timezone
 from datetime import datetime, timedelta
 
-from .models import Appointment, AppointmentDocument
+from .models import Appointment
 from apps.doctors.serializers import DoctorListSerializer
 from apps.users.serializers import UserSerializer
 
@@ -18,7 +18,7 @@ class PatientBasicSerializer(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     full_name = serializers.CharField(read_only=True)
     email = serializers.EmailField(read_only=True)
-    phone_number = serializers.CharField(read_only=True)
+    phone = serializers.CharField(read_only=True)
 
 
 class AppointmentListSerializer(serializers.ModelSerializer):
@@ -138,6 +138,7 @@ class AppointmentCreateSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         from apps.doctors.models import DoctorProfile
+        from apps.notifications.models import Notification
         
         doctor_id = validated_data.pop('doctor_id')
         doctor = DoctorProfile.objects.get(id=doctor_id)
@@ -157,6 +158,18 @@ class AppointmentCreateSerializer(serializers.ModelSerializer):
             consultation_fee=fee,
             end_time=end_time.strftime('%H:%M'),
             **validated_data
+        )
+
+        Notification.objects.create(
+            user=doctor.user,
+            notification_type=Notification.NotificationType.APPOINTMENT_BOOKED,
+            title='New appointment request',
+            message=(
+                f'{appointment.patient.full_name} requested an appointment on '
+                f'{appointment.appointment_date} at {appointment.time_slot}.'
+            ),
+            related_object_type='appointment',
+            related_object_id=str(appointment.id)
         )
         
         return appointment
@@ -190,28 +203,3 @@ class AppointmentRescheduleSerializer(serializers.Serializer):
         if value < timezone.now().date():
             raise serializers.ValidationError('Cannot reschedule to a past date')
         return value
-
-
-class AppointmentDocumentSerializer(serializers.ModelSerializer):
-    """
-    Serializer for appointment documents.
-    """
-    uploaded_by_name = serializers.CharField(source='uploaded_by.full_name', read_only=True)
-    
-    class Meta:
-        model = AppointmentDocument
-        fields = [
-            'id', 'document_type', 'title', 'file', 'notes',
-            'uploaded_by_name', 'created_at'
-        ]
-        read_only_fields = ['id', 'created_at']
-
-
-class AppointmentDocumentUploadSerializer(serializers.ModelSerializer):
-    """
-    Serializer for uploading appointment documents.
-    """
-    
-    class Meta:
-        model = AppointmentDocument
-        fields = ['document_type', 'title', 'file', 'notes']

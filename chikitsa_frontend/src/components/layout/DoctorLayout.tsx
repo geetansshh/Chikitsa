@@ -5,7 +5,9 @@
 import { useState } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/authStore'
+import { notificationsAPI } from '@/lib/api'
 import {
   HomeIcon,
   CalendarDaysIcon,
@@ -22,12 +24,20 @@ const sidebarLinks = [
   { name: 'Appointments', path: '/doctor/appointments', icon: CalendarDaysIcon },
   { name: 'Schedule', path: '/doctor/schedule', icon: ClockIcon },
   { name: 'Profile', path: '/doctor/profile', icon: UserCircleIcon },
+  { name: 'Notifications', path: '/doctor/notifications', icon: BellIcon },
 ]
 
 export default function DoctorLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { user, logout } = useAuthStore()
   const location = useLocation()
+  const { data: unreadData } = useQuery({
+    queryKey: ['unread-notifications'],
+    queryFn: () => notificationsAPI.getUnreadCount(),
+    enabled: true,
+    refetchInterval: 30000,
+  })
+  const unreadCount = unreadData?.data?.unread_count || 0
 
   const handleLogout = () => {
     logout()
@@ -140,10 +150,17 @@ export default function DoctorLayout() {
 
           <div className="flex items-center gap-4">
             {/* Notifications */}
-            <button className="relative p-2 rounded-lg hover:bg-gray-100">
+            <Link
+              to="/doctor/notifications"
+              className="relative p-2 rounded-lg hover:bg-gray-100"
+            >
               <BellIcon className="w-6 h-6 text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
 
             {/* Profile */}
             <Link to="/doctor/profile" className="flex items-center gap-2">

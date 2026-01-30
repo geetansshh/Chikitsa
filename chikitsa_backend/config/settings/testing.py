@@ -23,9 +23,6 @@ PASSWORD_HASHERS = [
 # Email - Use in-memory backend
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
-# Celery - Execute tasks synchronously
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True
 
 # Disable throttling in tests
 REST_FRAMEWORK['DEFAULT_THROTTLE_CLASSES'] = []

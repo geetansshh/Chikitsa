@@ -55,6 +55,7 @@ interface Specialty {
 export default function Register() {
   const navigate = useNavigate()
   const { login } = useAuthStore()
+  const requireDoctorVerification = import.meta.env.VITE_REQUIRE_DOCTOR_VERIFICATION === 'true'
   
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -134,16 +135,24 @@ export default function Register() {
       return authAPI.register(baseData)
     },
     onSuccess: async (response) => {
+      const verificationRequired = formData.role === 'DOCTOR' && requireDoctorVerification
+
+      if (verificationRequired) {
+        toast.success('Doctor account created! Please wait for admin verification.')
+        navigate('/doctor/pending')
+        return
+      }
+
       const { access, refresh, user } = response.data
       login(user, access, refresh)
-      
+
       if (formData.role === 'DOCTOR') {
-        toast.success('Doctor account created! Please wait for admin verification.')
+        toast.success('Doctor account created successfully!')
       } else {
         toast.success('Account created successfully!')
       }
-      
-      navigate('/dashboard')
+
+      navigate('/my-account')
     },
     onError: (error: {
       response?: {

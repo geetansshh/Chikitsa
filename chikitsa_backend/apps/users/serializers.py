@@ -6,8 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from dj_rest_auth.registration.serializers import RegisterSerializer
-
-from .models import PatientProfile
+from django.conf import settings
 
 User = get_user_model()
 
@@ -99,6 +98,13 @@ class CustomRegisterSerializer(RegisterSerializer):
                     field: 'This field is required for doctor registration.'
                     for field in missing_fields
                 })
+
+            # Enforce unique license number with a clear validation error
+            from apps.doctors.models import DoctorProfile
+            if DoctorProfile.objects.filter(license_number=data.get('license_number')).exists():
+                raise serializers.ValidationError({
+                    'license_number': 'This license number is already registered.'
+                })
         
         return data
     
@@ -139,6 +145,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         if user.role == User.Role.DOCTOR:
             from apps.doctors.models import DoctorProfile, Specialty
             
+            verification_required = settings.REQUIRE_DOCTOR_VERIFICATION
             doctor_data = self.cleaned_data.get('doctor_data', {})
             specialty = Specialty.objects.get(id=doctor_data['specialty_id'])
             
@@ -156,8 +163,12 @@ class CustomRegisterSerializer(RegisterSerializer):
                 clinic_zip=doctor_data.get('clinic_zip', ''),
                 clinic_phone=doctor_data.get('clinic_phone'),
                 consultation_fee=doctor_data.get('consultation_fee', 0),
-                is_verified=False,  # Doctors need to be verified by admin
+                is_verified=not verification_required,
             )
+
+            if not verification_required:
+                user.is_verified = True
+                user.save(update_fields=['is_verified'])
         
         return user
 
@@ -172,34 +183,3 @@ class ChangePasswordSerializer(serializers.Serializer):
     def validate_new_password(self, value):
         validate_password(value)
         return value
-
-
-class PatientProfileSerializer(serializers.ModelSerializer):
-    """
-    Serializer for patient profile.
-    """
-    user = UserSerializer(read_only=True)
-    
-    class Meta:
-        model = PatientProfile
-        fields = [
-            'id', 'user', 'blood_group', 'allergies', 'medical_conditions',
-            'medications', 'emergency_contact_name', 'emergency_contact_phone',
-            'emergency_contact_relation', 'insurance_provider', 'insurance_id',
-            'created_at', 'updated_at'
-        ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-
-class PatientProfileUpdateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for updating patient profile.
-    """
-    
-    class Meta:
-        model = PatientProfile
-        fields = [
-            'blood_group', 'allergies', 'medical_conditions', 'medications',
-            'emergency_contact_name', 'emergency_contact_phone',
-            'emergency_contact_relation', 'insurance_provider', 'insurance_id'
-        ]

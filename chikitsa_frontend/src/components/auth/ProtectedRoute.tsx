@@ -17,6 +17,7 @@ export default function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { isAuthenticated, user } = useAuthStore()
   const location = useLocation()
+  const requireDoctorVerification = import.meta.env.VITE_REQUIRE_DOCTOR_VERIFICATION === 'true'
   
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
@@ -24,6 +25,16 @@ export default function ProtectedRoute({
   
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return <Navigate to="/unauthorized" replace />
+  }
+
+  if (
+    requireDoctorVerification &&
+    user?.role === 'DOCTOR' &&
+    user.is_verified === false &&
+    location.pathname.startsWith('/doctor') &&
+    location.pathname !== '/doctor/pending'
+  ) {
+    return <Navigate to="/doctor/pending" replace />
   }
   
   return <>{children}</>
