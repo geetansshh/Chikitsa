@@ -258,7 +258,7 @@ LANGCHAIN_API_KEY = env('LANGCHAIN_API_KEY', default='')
 CHATBOT_CONFIG = {
     # Use Groq API (True) or fallback to OpenAI (False)
     'USE_GROQ': env.bool('USE_GROQ', default=True),
-    'MODEL_NAME': env('CHATBOT_MODEL', default='llama-3.1-70b-versatile'),
+    'MODEL_NAME': env('CHATBOT_MODEL', default='llama-3.3-70b-versatile'),
     'TEMPERATURE': 0.7,
     'MAX_TOKENS': 512,
     'GROQ_API_KEY': env('GROQ_API_KEY', default=''),
