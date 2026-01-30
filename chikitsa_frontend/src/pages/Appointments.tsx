@@ -15,7 +15,6 @@ import { PageLoading } from '@/components/ui/LoadingSpinner'
 import {
   CalendarDaysIcon,
   ClockIcon,
-  XMarkIcon,
   ExclamationCircleIcon,
   StarIcon,
 } from '@heroicons/react/24/outline'
@@ -323,21 +322,23 @@ export default function Appointments() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleCancelClick(appointment)}
+                            >
+                              Cancel
+                            </Button>
                             {appointment.doctor && (
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() =>
-                                  (window.location.href = `/doctors/${appointment.doctor.id}`)
-                                }
+                                onClick={() => {
+                                  const doctorId = appointment.doctor?.id;
+                                  if (doctorId) {
+                                    window.location.href = `/doctors/${doctorId}`;
+                                  }
+                                }}
                               >
                                 Reschedule
                               </Button>
-                            )}ow.location.href = `/doctors/${appointment.doctor.id}`)
-                              }
-                            >
-                              Reschedule
-                            </Button>
+                            )}
                           </div>
                         )}
                         
