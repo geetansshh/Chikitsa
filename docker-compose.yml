@@ -10,25 +10,34 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - chikitsa-network
 
   backend:
     build: ./chikitsa_backend
     container_name: chikitsa-backend
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py makemigrations --noinput &&
+             python manage.py migrate --noinput &&
+             python manage.py seed_data &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./chikitsa_backend:/backend
+      - ./chikitsa_backend:/chikitsa-backend
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/chikitsa_db
-      - GROQ_API_KEY=${GROQ_API_KEY}
-      - CHATBOT_MODEL=${CHATBOT_MODEL}
-      - REQUIRE_DOCTOR_VERIFICATION=${REQUIRE_DOCTOR_VERIFICATION}
       - DEBUG=True
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - chikitsa-network
 
@@ -42,6 +51,7 @@ services:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost:8000/api/v1
+      - VITE_API_PROXY_TARGET=http://backend:8000
       - VITE_REQUIRE_DOCTOR_VERIFICATION=${REQUIRE_DOCTOR_VERIFICATION}
     depends_on:
       - backend

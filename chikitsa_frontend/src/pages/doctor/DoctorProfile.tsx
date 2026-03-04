@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { PageLoading } from '@/components/ui/LoadingSpinner'
+import usePageTitle from '@/hooks/usePageTitle'
 import {
   UserCircleIcon,
   AcademicCapIcon,
@@ -52,6 +53,7 @@ interface DoctorProfile {
 }
 
 export default function DoctorProfile() {
+  usePageTitle('Doctor Profile')
   const queryClient = useQueryClient()
   
   const [formData, setFormData] = useState({
@@ -147,14 +149,14 @@ export default function DoctorProfile() {
   if (isLoading) return <PageLoading />
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-6 sm:py-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-        <p className="text-gray-500">Manage your professional profile</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400">Manage your professional profile</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Profile Overview Card */}
         <div>
           <Card className="text-center">
@@ -165,10 +167,10 @@ export default function DoctorProfile() {
               </span>
             </div>
             
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Dr. {profile?.user.first_name} {profile?.user.last_name}
             </h2>
-            <p className="text-gray-500">{profile?.specialty?.name}</p>
+            <p className="text-gray-500 dark:text-gray-400">{profile?.specialty?.name}</p>
             
             <div className="flex items-center justify-center gap-1 mt-2">
               {profile?.is_verified && (
@@ -179,29 +181,29 @@ export default function DoctorProfile() {
               )}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 space-y-4">
+            <div className="mt-6 pt-6 border-t border-gray-100 dark:border-slate-700 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-gray-500 flex items-center gap-2">
+                <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   <StarIcon className="w-5 h-5" />
                   Rating
                 </span>
-                <span className="font-semibold">
+                <span className="font-semibold dark:text-white">
                   {Number(profile?.average_rating || 0).toFixed(1)} ({profile?.total_reviews || 0} reviews)
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-500 flex items-center gap-2">
+                <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   <AcademicCapIcon className="w-5 h-5" />
                   Experience
                 </span>
-                <span className="font-semibold">{profile?.years_of_experience} years</span>
+                <span className="font-semibold dark:text-white">{profile?.years_of_experience} years</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-500 flex items-center gap-2">
+                <span className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   <CurrencyRupeeIcon className="w-5 h-5" />
                   Consultation Fee
                 </span>
-                <span className="font-semibold">₹{profile?.consultation_fee}</span>
+                <span className="font-semibold dark:text-white">₹{profile?.consultation_fee}</span>
               </div>
             </div>
           </Card>
@@ -211,7 +213,7 @@ export default function DoctorProfile() {
         <div className="lg:col-span-2">
           <form onSubmit={handleSubmit}>
             <Card>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <UserCircleIcon className="w-5 h-5 text-primary-500" />
                 Personal Information
               </h3>
@@ -242,7 +244,7 @@ export default function DoctorProfile() {
             </Card>
 
             <Card className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <AcademicCapIcon className="w-5 h-5 text-primary-500" />
                 Professional Details
               </h3>
@@ -287,7 +289,7 @@ export default function DoctorProfile() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Bio / About
                 </label>
                 <textarea
@@ -295,13 +297,13 @@ export default function DoctorProfile() {
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                   placeholder="Tell patients about yourself, your expertise, and approach to care..."
                   rows={4}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                  className="w-full border border-gray-300 dark:border-slate-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none dark:bg-slate-700 dark:text-white"
                 />
               </div>
             </Card>
 
             <Card className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <BuildingOfficeIcon className="w-5 h-5 text-primary-500" />
                 Clinic Information
               </h3>
@@ -314,7 +316,7 @@ export default function DoctorProfile() {
                   placeholder="Your Clinic Name"
                 />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Clinic Address
                   </label>
                   <textarea
@@ -322,11 +324,11 @@ export default function DoctorProfile() {
                     onChange={(e) => setFormData({ ...formData, clinic_address: e.target.value })}
                     placeholder="Full clinic address"
                     rows={2}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                    className="w-full border border-gray-300 dark:border-slate-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none dark:bg-slate-700 dark:text-white"
                   />
                 </div>
                 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <Input
                     label="City"
                     value={formData.clinic_city}
@@ -347,7 +349,7 @@ export default function DoctorProfile() {
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Clinic Phone"
                     value={formData.clinic_phone}
@@ -369,18 +371,18 @@ export default function DoctorProfile() {
                     onChange={(e) => setFormData({ ...formData, is_accepting_patients: e.target.checked })}
                     className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                   />
-                  <label className="ml-2 text-sm text-gray-700">
+                  <label className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                     Currently accepting new patients
                   </label>
                 </div>
               </div>
             </Card>
 
-            <div className="flex justify-end gap-4 mt-6">
-              <Button type="button" variant="secondary">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-6">
+              <Button type="button" variant="secondary" className="w-full sm:w-auto">
                 Cancel
               </Button>
-              <Button type="submit" isLoading={updateMutation.isPending}>
+              <Button type="submit" isLoading={updateMutation.isPending} className="w-full sm:w-auto">
                 Save Changes
               </Button>
             </div>

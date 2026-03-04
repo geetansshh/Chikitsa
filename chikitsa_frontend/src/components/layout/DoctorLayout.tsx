@@ -45,7 +45,12 @@ export default function DoctorLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 relative">
+      {/* Decorative background blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10" aria-hidden>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/15 dark:bg-primary-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-20 w-72 h-72 bg-orange-200/10 dark:bg-orange-500/5 rounded-full blur-3xl" />
+      </div>
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -61,28 +66,28 @@ export default function DoctorLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white/80 dark:bg-slate-800/90 backdrop-blur-2xl shadow-lg border-r border-white/40 dark:border-slate-700 transform transition-transform duration-300 lg:translate-x-0 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-6 border-b">
+        <div className="h-16 flex items-center justify-between px-6 border-b dark:border-slate-700">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">C</span>
             </div>
-            <span className="font-bold text-gray-900">Chikitsa</span>
+            <span className="font-bold text-gray-900 dark:text-white">Chikitsa</span>
           </Link>
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="lg:hidden p-1 rounded hover:bg-gray-100"
+            className="lg:hidden p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
 
         {/* Doctor Info */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b dark:border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center">
               <span className="text-white font-semibold">
@@ -90,10 +95,10 @@ export default function DoctorLayout() {
               </span>
             </div>
             <div>
-              <p className="font-medium text-gray-900 text-sm">
+              <p className="font-medium text-gray-900 dark:text-white text-sm">
                 Dr. {user?.first_name} {user?.last_name}
               </p>
-              <p className="text-xs text-gray-500">Doctor</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Doctor</p>
             </div>
           </div>
         </div>
@@ -112,8 +117,8 @@ export default function DoctorLayout() {
                 onClick={() => setIsSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
-                    ? 'bg-primary-50 text-primary-600'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
                 }`}
               >
                 <link.icon className="w-5 h-5" />
@@ -124,10 +129,10 @@ export default function DoctorLayout() {
         </nav>
 
         {/* Bottom Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t dark:border-slate-700">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+            className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
           >
             <ArrowRightOnRectangleIcon className="w-5 h-5" />
             <span className="font-medium">Logout</span>
@@ -138,12 +143,12 @@ export default function DoctorLayout() {
       {/* Main Content */}
       <div className="lg:ml-64">
         {/* Top Header */}
-        <header className="h-16 bg-white shadow-sm flex items-center justify-between px-4 lg:px-8">
+        <header className="h-16 bg-white dark:bg-slate-800 shadow-sm dark:shadow-slate-900/50 flex items-center justify-between px-4 lg:px-8">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
           >
-            <Bars3Icon className="w-6 h-6" />
+            <Bars3Icon className="w-6 h-6 dark:text-gray-200" />
           </button>
 
           <div className="flex-1 lg:ml-0" />
@@ -152,9 +157,9 @@ export default function DoctorLayout() {
             {/* Notifications */}
             <Link
               to="/doctor/notifications"
-              className="relative p-2 rounded-lg hover:bg-gray-100"
+              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
             >
-              <BellIcon className="w-6 h-6 text-gray-600" />
+              <BellIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
                   {unreadCount > 9 ? '9+' : unreadCount}

@@ -12,6 +12,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { PageLoading } from '@/components/ui/LoadingSpinner'
+import usePageTitle from '@/hooks/usePageTitle'
 import {
   UserCircleIcon,
   EnvelopeIcon,
@@ -37,6 +38,7 @@ interface UserProfile {
 }
 
 export default function Profile() {
+  usePageTitle('My Profile')
   const queryClient = useQueryClient()
   const { user: authUser, login } = useAuthStore()
   
@@ -138,7 +140,7 @@ export default function Profile() {
   if (isLoading) return <PageLoading />
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 py-8">
+    <div className="min-h-[calc(100vh-4.5rem)] bg-gray-50 dark:bg-slate-900 py-6 sm:py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <motion.div
@@ -146,8 +148,8 @@ export default function Profile() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-          <p className="text-gray-500 mt-2">Manage your personal information and security</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Account Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Manage your personal information and security</p>
         </motion.div>
 
         {/* Profile Overview Card */}
@@ -157,25 +159,25 @@ export default function Profile() {
           transition={{ delay: 0.1 }}
         >
           <Card className="mb-6">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-2xl">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 text-center sm:text-left">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-xl sm:text-2xl">
                   {profile?.first_name?.charAt(0)}
                   {profile?.last_name?.charAt(0)}
                 </span>
               </div>
               
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">
                   {profile?.full_name}
                 </h2>
-                <p className="text-gray-500">{profile?.email}</p>
-                <div className="flex items-center gap-4 mt-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base truncate">{profile?.email}</p>
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4 mt-2">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300">
                     {profile?.role}
                   </span>
                   {profile?.is_verified && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-500/20 text-green-800 dark:text-green-300">
                       ✓ Verified
                     </span>
                   )}
@@ -192,14 +194,14 @@ export default function Profile() {
           transition={{ delay: 0.2 }}
           className="mb-6"
         >
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex gap-8">
+          <div className="border-b border-gray-200 dark:border-slate-700">
+            <nav className="-mb-px flex gap-4 sm:gap-8 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'profile'
                     ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
                 }`}
               >
                 <UserCircleIcon className="w-5 h-5 inline-block mr-2" />
@@ -210,7 +212,7 @@ export default function Profile() {
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === 'password'
                     ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
                 }`}
               >
                 <LockClosedIcon className="w-5 h-5 inline-block mr-2" />
@@ -230,7 +232,7 @@ export default function Profile() {
             <Card>
               <form onSubmit={handleProfileSubmit} className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Personal Information</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
@@ -272,8 +274,8 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Details</h3>
+                <div className="border-t dark:border-slate-700 pt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Additional Details</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
@@ -285,13 +287,13 @@ export default function Profile() {
                     />
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Gender
                       </label>
                       <select
                         value={formData.gender}
                         onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-slate-700 dark:text-white"
                       >
                         <option value="">Select gender</option>
                         <option value="M">Male</option>
@@ -302,14 +304,14 @@ export default function Profile() {
                   </div>
                   
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Address
                     </label>
                     <textarea
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-slate-700 dark:text-white"
                       placeholder="Enter your full address"
                     />
                   </div>
@@ -335,8 +337,8 @@ export default function Profile() {
             <Card>
               <form onSubmit={handlePasswordSubmit} className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
-                  <p className="text-sm text-gray-500 mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Change Password</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                     Ensure your account is using a long, random password to stay secure.
                   </p>
                   

@@ -32,6 +32,7 @@ class AppointmentListSerializer(serializers.ModelSerializer):
     patient = PatientBasicSerializer(read_only=True)
     is_upcoming = serializers.BooleanField(read_only=True)
     is_cancellable = serializers.BooleanField(read_only=True)
+    is_reviewed = serializers.SerializerMethodField()
     
     class Meta:
         model = Appointment
@@ -39,8 +40,15 @@ class AppointmentListSerializer(serializers.ModelSerializer):
             'id', 'doctor_id', 'doctor_name', 'doctor_specialty', 'patient_name', 'patient',
             'appointment_date', 'time_slot', 'appointment_type',
             'status', 'consultation_fee', 'payment_status',
-            'patient_symptoms', 'is_upcoming', 'is_cancellable', 'created_at'
+            'patient_symptoms', 'is_upcoming', 'is_cancellable', 'is_reviewed', 'created_at'
         ]
+    
+    def get_is_reviewed(self, obj):
+        from apps.doctors.models import DoctorReview
+        try:
+            return obj.review is not None
+        except DoctorReview.DoesNotExist:
+            return False
 
 
 class AppointmentDetailSerializer(serializers.ModelSerializer):
@@ -80,13 +88,17 @@ class AppointmentCreateSerializer(serializers.ModelSerializer):
     
     def validate_doctor_id(self, value):
         from apps.doctors.models import DoctorProfile
+        from django.conf import settings
         try:
-            doctor = DoctorProfile.objects.get(id=value, is_verified=True)
+            filters = {'id': value}
+            if settings.REQUIRE_DOCTOR_VERIFICATION:
+                filters['is_verified'] = True
+            doctor = DoctorProfile.objects.get(**filters)
             if not doctor.is_accepting_patients:
                 raise serializers.ValidationError('Doctor is not accepting new patients')
             return value
         except DoctorProfile.DoesNotExist:
-            raise serializers.ValidationError('Doctor not found')
+            raise serializers.ValidationError('Doctor not found or not verified')
     
     def validate_appointment_date(self, value):
         if value < timezone.now().date():

@@ -8,6 +8,9 @@ import os
 
 DEBUG = False
 
+# Force SECRET_KEY from environment — crash if missing
+SECRET_KEY = os.environ['SECRET_KEY']
+
 # Get ALLOWED_HOSTS from environment or use Render default
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '.onrender.com').split(',')
 
@@ -31,6 +34,10 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+# Content Security Policy (basic restrictive policy)
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # Static files with WhiteNoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

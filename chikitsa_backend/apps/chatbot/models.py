@@ -68,6 +68,10 @@ class Message(TimeStampedModel):
     model_used = models.CharField(max_length=50, blank=True)
     response_time_ms = models.PositiveIntegerField(default=0)
     
+    # User feedback
+    is_helpful = models.BooleanField(null=True, blank=True)
+    feedback_text = models.TextField(blank=True)
+    
     class Meta:
         verbose_name = _('message')
         verbose_name_plural = _('messages')

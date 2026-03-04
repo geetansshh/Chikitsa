@@ -12,6 +12,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import { PageLoading } from '@/components/ui/LoadingSpinner'
+import usePageTitle from '@/hooks/usePageTitle'
 import {
   CalendarDaysIcon,
   ClockIcon,
@@ -54,6 +55,7 @@ const dateFilters = [
 ]
 
 export default function DoctorAppointments() {
+  usePageTitle('Doctor Appointments')
   const queryClient = useQueryClient()
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('today')
@@ -156,12 +158,12 @@ export default function DoctorAppointments() {
   if (isLoading) return <PageLoading />
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-6 sm:py-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
-          <p className="text-gray-500">Manage your patient appointments</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
+          <p className="text-gray-500 dark:text-gray-400">Manage your patient appointments</p>
         </div>
       </div>
 
@@ -172,7 +174,7 @@ export default function DoctorAppointments() {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
           >
             {dateFilters.map((filter) => (
               <option key={filter.value} value={filter.value}>
@@ -182,15 +184,15 @@ export default function DoctorAppointments() {
           </select>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-nowrap overflow-x-auto pb-1 scrollbar-hide">
           {statusFilters.map((filter) => (
             <button
               key={filter.value}
               onClick={() => setStatusFilter(filter.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 statusFilter === filter.value
                   ? 'bg-primary-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               {filter.label}
@@ -212,19 +214,19 @@ export default function DoctorAppointments() {
                 transition={{ delay: index * 0.05 }}
               >
                 <Card className="hover:shadow-lg transition-shadow">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     {/* Patient Info */}
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="w-11 h-11 sm:w-14 sm:h-14 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-bold text-sm sm:text-lg">
                           {appointment.patient?.full_name?.charAt(0) || 'P'}
                         </span>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base truncate">
                           {appointment.patient?.full_name || 'Patient'}
                         </h3>
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-1">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                           <span className="flex items-center gap-1">
                             <CalendarDaysIcon className="w-4 h-4" />
                             {format(parseISO(appointment.appointment_date), 'MMM d, yyyy')}
@@ -233,7 +235,7 @@ export default function DoctorAppointments() {
                             <ClockIcon className="w-4 h-4" />
                             {appointment.time_slot}
                           </span>
-                          <span className="capitalize bg-gray-100 px-2 py-0.5 rounded">
+                          <span className="capitalize bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded">
                             {appointment.appointment_type}
                           </span>
                         </div>
@@ -241,16 +243,16 @@ export default function DoctorAppointments() {
                     </div>
 
                     {/* Status & Actions */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                       <span
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium border ${getStatusBadge(
+                        className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium border ${getStatusBadge(
                           appointment.status
                         )}`}
                       >
                         {appointment.status}
                       </span>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -301,8 +303,8 @@ export default function DoctorAppointments() {
 
                   {/* Symptoms preview */}
                   {appointment.patient_symptoms && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <p className="text-sm text-gray-500">
+                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         <span className="font-medium">Symptoms:</span>{' '}
                         {appointment.patient_symptoms.slice(0, 150)}
                         {appointment.patient_symptoms.length > 150 && '...'}
@@ -316,11 +318,11 @@ export default function DoctorAppointments() {
         </div>
       ) : (
         <Card className="text-center py-12">
-          <CalendarDaysIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <CalendarDaysIcon className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             No appointments found
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             {dateFilter === 'today'
               ? "You don't have any appointments scheduled for today."
               : 'No appointments match your current filters.'}
@@ -338,19 +340,19 @@ export default function DoctorAppointments() {
         {selectedAppointment && (
           <div className="space-y-6">
             {/* Patient Info */}
-            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
               <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xl">
                   {selectedAppointment.patient?.full_name?.charAt(0) || 'P'}
                 </span>
               </div>
               <div>
-                <h3 className="font-semibold text-lg text-gray-900">
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
                   {selectedAppointment.patient?.full_name}
                 </h3>
-                <p className="text-gray-500">{selectedAppointment.patient?.email}</p>
+                <p className="text-gray-500 dark:text-gray-400">{selectedAppointment.patient?.email}</p>
                 {selectedAppointment.patient?.phone_number && (
-                  <p className="text-gray-500 flex items-center gap-1">
+                  <p className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <PhoneIcon className="w-4 h-4" />
                     {selectedAppointment.patient.phone_number}
                   </p>
@@ -359,23 +361,23 @@ export default function DoctorAppointments() {
             </div>
 
             {/* Appointment Details */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Date</p>
-                <p className="font-medium">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Date</p>
+                <p className="font-medium dark:text-white">
                   {format(parseISO(selectedAppointment.appointment_date), 'EEEE, MMMM d, yyyy')}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Time</p>
-                <p className="font-medium">{selectedAppointment.time_slot}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Time</p>
+                <p className="font-medium dark:text-white">{selectedAppointment.time_slot}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Type</p>
-                <p className="font-medium capitalize">{selectedAppointment.appointment_type}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Type</p>
+                <p className="font-medium capitalize dark:text-white">{selectedAppointment.appointment_type}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Status</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
                 <span
                   className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(
                     selectedAppointment.status
@@ -389,15 +391,15 @@ export default function DoctorAppointments() {
             {/* Symptoms */}
             {selectedAppointment.patient_symptoms && (
               <div>
-                <p className="text-sm text-gray-500 mb-2">Patient's Symptoms</p>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-700">{selectedAppointment.patient_symptoms}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Patient's Symptoms</p>
+                <div className="p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                  <p className="text-gray-700 dark:text-gray-300">{selectedAppointment.patient_symptoms}</p>
                 </div>
               </div>
             )}
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 pt-4 border-t dark:border-slate-700">
               <Button variant="secondary" onClick={() => setIsDetailModalOpen(false)}>
                 Close
               </Button>

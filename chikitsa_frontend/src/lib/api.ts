@@ -115,6 +115,17 @@ export const authAPI = {
       old_password: oldPassword,
       new_password: newPassword,
     }),
+
+  forgotPassword: (email: string) =>
+    api.post('/auth/password/reset/', { email }),
+
+  resetPasswordConfirm: (uid: string, token: string, newPassword1: string, newPassword2: string) =>
+    api.post('/auth/password/reset/confirm/', {
+      uid,
+      token,
+      new_password1: newPassword1,
+      new_password2: newPassword2,
+    }),
 }
 
 export const doctorsAPI = {
@@ -134,6 +145,7 @@ export const doctorsAPI = {
     rating: number
     title?: string
     comment: string
+    appointment_id: string
   }) => api.post(`/doctors/${doctorId}/reviews/create/`, data),
   
   // Doctor self-management APIs

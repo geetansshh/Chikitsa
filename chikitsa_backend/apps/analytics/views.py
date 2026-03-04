@@ -6,7 +6,7 @@ Provides dashboard data and statistics.
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.utils import timezone
 from datetime import timedelta
 
@@ -79,7 +79,9 @@ class DoctorDashboardView(APIView):
         
         # Calculate earnings from completed appointments
         completed_appointments = appointments.filter(status='completed')
-        total_earnings = completed_appointments.count() * float(doctor.consultation_fee)
+        total_earnings = float(
+            completed_appointments.aggregate(total=Sum('consultation_fee'))['total'] or 0
+        )
         
         # Response matching frontend expectations
         response_data = {
@@ -107,7 +109,7 @@ class DoctorDashboardView(APIView):
             'patient_name': apt.patient.full_name,
             'appointment_date': apt.appointment_date.isoformat(),
             'time_slot': apt.time_slot,
-            'status': apt.status.upper(),
+            'status': apt.status,
             'appointment_type': apt.appointment_type,
             'symptoms': apt.patient_symptoms[:100] if apt.patient_symptoms else '',
         } for apt in todays_appointments[:10]]

@@ -2,6 +2,9 @@
 Views for appointments app.
 """
 
+import logging
+import uuid
+
 from rest_framework import generics, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,6 +24,8 @@ from .serializers import (
 )
 from .filters import AppointmentFilter
 from apps.core.permissions import IsDoctor, IsOwnerOrAdmin
+
+logger = logging.getLogger(__name__)
 
 
 class AppointmentListCreateView(generics.ListCreateAPIView):
@@ -335,7 +340,7 @@ class AppointmentCompleteView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        if appointment.status == 'completed':
+        if appointment.status == Appointment.Status.COMPLETED:
             return Response(
                 {'error': 'Appointment already completed'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -343,7 +348,7 @@ class AppointmentCompleteView(APIView):
         
         try:
             # Update appointment
-            appointment.status = 'completed'
+            appointment.status = Appointment.Status.COMPLETED
             appointment.doctor_notes = request.data.get('doctor_notes', appointment.doctor_notes)
             appointment.prescription = request.data.get('prescription', appointment.prescription)
             appointment.diagnosis = request.data.get('diagnosis', appointment.diagnosis)
@@ -353,7 +358,7 @@ class AppointmentCompleteView(APIView):
             from apps.notifications.models import Notification
             Notification.objects.create(
                 user=appointment.patient,
-                notification_type='appointment_completed',
+                notification_type=Notification.NotificationType.APPOINTMENT_COMPLETED,
                 title='How was your consultation?',
                 message=f'Please share your experience with Dr. {appointment.doctor.user.full_name}',
                 related_object_type='appointment',
@@ -365,10 +370,9 @@ class AppointmentCompleteView(APIView):
                 'appointment': AppointmentDetailSerializer(appointment).data
             })
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            logger.error(f'Error completing appointment {pk}: {e}', exc_info=True)
             return Response(
-                {'error': str(e)},
+                {'error': 'Failed to complete appointment. Please try again.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -381,38 +385,34 @@ class AppointmentPaymentView(APIView):
     
     def post(self, request, pk):
         try:
-            try:
-                appointment = Appointment.objects.get(pk=pk, patient=request.user)
-            except Appointment.DoesNotExist:
-                return Response(
-                    {'error': 'Appointment not found'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            if appointment.payment_status == 'paid':
-                return Response(
-                    {'error': 'Payment already completed'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
+            appointment = Appointment.objects.get(pk=pk, patient=request.user)
+        except Appointment.DoesNotExist:
+            return Response(
+                {'error': 'Appointment not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        if appointment.payment_status == Appointment.PaymentStatus.PAID:
+            return Response(
+                {'error': 'Payment already completed'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
             # Simulate payment gateway processing
-            payment_method = request.data.get('payment_method', 'card')
-            
             # In real implementation, integrate with Razorpay, Stripe, etc.
-            # For now, we'll simulate successful payment
-            import uuid
             payment_id = f'PAY_{uuid.uuid4().hex[:12].upper()}'
             
-            appointment.payment_status = 'paid'
+            appointment.payment_status = Appointment.PaymentStatus.PAID
             appointment.payment_id = payment_id
-            appointment.status = 'confirmed'  # Auto-confirm on payment
+            appointment.status = Appointment.Status.CONFIRMED
             appointment.save()
             
             # Send notification
             from apps.notifications.models import Notification
             Notification.objects.create(
                 user=appointment.patient,
-                notification_type='appointment_confirmed',
+                notification_type=Notification.NotificationType.APPOINTMENT_CONFIRMED,
                 title='Payment Successful',
                 message=f'Your payment of ₹{appointment.consultation_fee} has been received. Appointment confirmed!',
                 related_object_type='appointment',
@@ -425,10 +425,8 @@ class AppointmentPaymentView(APIView):
                 'appointment': AppointmentDetailSerializer(appointment).data
             })
         except Exception as e:
-            import traceback
-            print(f"Payment error: {str(e)}")
-            print(traceback.format_exc())
+            logger.error(f'Payment error for appointment {pk}: {e}', exc_info=True)
             return Response(
-                {'error': f'Payment processing failed: {str(e)}'},
+                {'error': 'Payment processing failed. Please try again.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

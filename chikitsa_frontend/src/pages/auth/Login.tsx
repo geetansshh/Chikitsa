@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/authStore'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
+import usePageTitle from '@/hooks/usePageTitle'
 import {
   EnvelopeIcon,
   LockClosedIcon,
@@ -19,6 +20,7 @@ import {
 } from '@heroicons/react/24/outline'
 
 export default function Login() {
+  usePageTitle('Sign In')
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuthStore()
@@ -71,7 +73,7 @@ export default function Login() {
   }
   
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-12 px-4">
+    <div className="min-h-[calc(100vh-5rem)] flex items-center justify-center py-8 sm:py-12 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -82,13 +84,13 @@ export default function Login() {
           <div className="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4">
             <SparklesIcon className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-          <p className="text-gray-500 mt-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
             Sign in to your Chikitsa account
           </p>
         </div>
         
-        <Card>
+        <Card className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-2xl border border-white/40 dark:border-slate-700 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Email Address"
@@ -118,7 +120,7 @@ export default function Login() {
                   type="checkbox"
                   className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
                 />
-                <span className="text-sm text-gray-600">Remember me</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Remember me</span>
               </label>
               <Link
                 to="/forgot-password"
@@ -129,7 +131,7 @@ export default function Login() {
             </div>
             
             {errors.general && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg">
                 <p className="text-sm text-red-600">{errors.general}</p>
               </div>
             )}
@@ -145,7 +147,7 @@ export default function Login() {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               Don't have an account?{' '}
               <Link
                 to="/register"
@@ -158,21 +160,29 @@ export default function Login() {
         </Card>
         
         {/* Demo credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-500 text-center mb-3">
+        <div className="mt-6 p-4 bg-white/30 dark:bg-slate-800/30 backdrop-blur-lg rounded-lg border border-white/40 dark:border-slate-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">
             Demo Credentials
           </p>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="p-3 bg-white rounded-lg border">
-              <p className="font-medium text-gray-700 mb-1">👤 Patient</p>
-              <p className="text-gray-600">patient@demo.com</p>
-              <p className="text-gray-500">demo123456</p>
-            </div>
-            <div className="p-3 bg-white rounded-lg border">
-              <p className="font-medium text-gray-700 mb-1">🩺 Doctor</p>
-              <p className="text-gray-600">doctor@demo.com</p>
-              <p className="text-gray-500">demo123456</p>
-            </div>
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 text-sm">
+            <button
+              type="button"
+              onClick={() => { setEmail('patient@demo.com'); setPassword('demo123456') }}
+              className="p-3 bg-white dark:bg-slate-700 rounded-lg border dark:border-slate-600 hover:border-primary-300 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/10 transition-colors text-left cursor-pointer"
+            >
+              <p className="font-medium text-gray-700 dark:text-gray-200 mb-1">👤 Patient</p>
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm truncate">patient@demo.com</p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs">demo123456</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEmail('doctor@demo.com'); setPassword('demo123456') }}
+              className="p-3 bg-white dark:bg-slate-700 rounded-lg border dark:border-slate-600 hover:border-primary-300 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-500/10 transition-colors text-left cursor-pointer"
+            >
+              <p className="font-medium text-gray-700 dark:text-gray-200 mb-1">🩺 Doctor</p>
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm truncate">doctor@demo.com</p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs">demo123456</p>
+            </button>
           </div>
         </div>
       </motion.div>

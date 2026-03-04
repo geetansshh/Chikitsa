@@ -36,18 +36,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+      'inline-flex items-center justify-center font-medium rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed'
     
     const variants = {
       primary:
-        'bg-gradient-to-r from-primary-500 to-secondary-500 text-white hover:from-primary-600 hover:to-secondary-600 focus:ring-primary-500 shadow-lg hover:shadow-xl',
+        'bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 btn-3d btn-3d-primary',
       secondary:
-        'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500',
+        'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-600 focus:ring-gray-500 btn-3d',
       outline:
-        'border-2 border-primary-500 text-primary-500 hover:bg-primary-50 focus:ring-primary-500',
-      ghost: 'text-gray-600 hover:bg-gray-100 focus:ring-gray-500',
+        'border-2 border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 focus:ring-primary-500 btn-3d',
+      ghost: 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 focus:ring-gray-500',
       danger:
-        'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
+        'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500 btn-3d',
     }
     
     const sizes = {
@@ -60,7 +60,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <motion.button
         ref={ref}
         type={type}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ y: -2 }}
+        whileTap={{ scale: 0.97, y: 2 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         className={clsx(
           baseStyles,
           variants[variant],

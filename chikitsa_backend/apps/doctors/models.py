@@ -198,6 +198,7 @@ class DoctorLeave(TimeStampedModel):
 class DoctorReview(BaseModel):
     """
     Patient reviews for doctors.
+    Each review is tied to a specific completed appointment.
     """
     doctor = models.ForeignKey(
         DoctorProfile,
@@ -208,6 +209,13 @@ class DoctorReview(BaseModel):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='doctor_reviews'
+    )
+    appointment = models.OneToOneField(
+        'appointments.Appointment',
+        on_delete=models.CASCADE,
+        related_name='review',
+        null=True,
+        blank=True,
     )
     rating = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
@@ -224,7 +232,6 @@ class DoctorReview(BaseModel):
     class Meta:
         verbose_name = _('doctor review')
         verbose_name_plural = _('doctor reviews')
-        unique_together = ['doctor', 'patient']
         ordering = ['-created_at']
     
     def __str__(self):

@@ -163,13 +163,36 @@ class DoctorReviewSerializer(serializers.ModelSerializer):
 class DoctorReviewCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating doctor reviews.
+    Each review is tied to a specific completed appointment.
     """
+    appointment_id = serializers.UUIDField(write_only=True)
     
     class Meta:
         model = DoctorReview
-        fields = ['rating', 'title', 'comment', 'is_anonymous']
+        fields = ['rating', 'title', 'comment', 'is_anonymous', 'appointment_id']
     
     def validate_rating(self, value):
         if value < 1 or value > 5:
             raise serializers.ValidationError('Rating must be between 1 and 5')
+        return value
+    
+    def validate_appointment_id(self, value):
+        from apps.appointments.models import Appointment
+        request = self.context.get('request')
+        
+        try:
+            appointment = Appointment.objects.get(id=value, patient=request.user)
+        except Appointment.DoesNotExist:
+            raise serializers.ValidationError('Appointment not found.')
+        
+        if appointment.status != Appointment.Status.COMPLETED:
+            raise serializers.ValidationError('You can only review completed appointments.')
+        
+        # Check if already reviewed (OneToOneField reverse access)
+        try:
+            if appointment.review:
+                raise serializers.ValidationError('You have already reviewed this appointment.')
+        except DoctorReview.DoesNotExist:
+            pass
+        
         return value

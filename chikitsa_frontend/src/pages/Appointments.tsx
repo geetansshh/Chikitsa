@@ -12,6 +12,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import { PageLoading } from '@/components/ui/LoadingSpinner'
+import usePageTitle from '@/hooks/usePageTitle'
 import {
   CalendarDaysIcon,
   ClockIcon,
@@ -43,6 +44,7 @@ interface Appointment {
   payment_status?: string
   is_upcoming?: boolean
   is_cancellable?: boolean
+  is_reviewed?: boolean
 }
 
 const statusColors: Record<string, string> = {
@@ -59,6 +61,7 @@ const statusColors: Record<string, string> = {
 }
 
 export default function Appointments() {
+  usePageTitle('My Appointments')
   const [activeTab, setActiveTab] = useState<TabType>('upcoming')
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showReviewModal, setShowReviewModal] = useState(false)
@@ -102,18 +105,6 @@ export default function Appointments() {
     },
   })
 
-  // Payment mutation
-  useMutation({
-    mutationFn: (id: string) => appointmentsAPI.payForAppointment(id, 'card'),
-    onSuccess: () => {
-      toast.success('Payment successful! Appointment confirmed.')
-      queryClient.invalidateQueries({ queryKey: ['appointments'] })
-    },
-    onError: () => {
-      toast.error('Payment failed. Please try again.')
-    },
-  })
-
   // Review mutation
   const reviewMutation = useMutation({
     mutationFn: ({ doctorId, data }: { doctorId: string; data: any }) =>
@@ -127,8 +118,11 @@ export default function Appointments() {
       setReviewComment('')
       setReviewTitle('')
     },
-    onError: () => {
-      toast.error('Failed to submit review')
+    onError: (error: any) => {
+      const message = error?.response?.data?.detail || 
+                      error?.response?.data?.non_field_errors?.[0] ||
+                      'Failed to submit review'
+      toast.error(message)
     },
   })
   
@@ -165,6 +159,7 @@ export default function Appointments() {
           rating: reviewRating,
           title: reviewTitle,
           comment: reviewComment,
+          appointment_id: selectedAppointment.id,
         },
       })
     } else {
@@ -195,30 +190,30 @@ export default function Appointments() {
   ]
   
   return (
-    <div className="py-8">
+    <div className="py-6 sm:py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             My Appointments
           </h1>
-          <p className="text-gray-600">Manage and track your appointments</p>
+          <p className="text-gray-600 dark:text-gray-300">Manage and track your appointments</p>
         </motion.div>
         
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as TabType)}
-              className={`px-6 py-2 rounded-full font-medium transition-colors ${
+              className={`px-5 sm:px-6 py-2 rounded-full font-medium transition-colors whitespace-nowrap text-sm sm:text-base ${
                 activeTab === tab.key
                   ? 'bg-primary-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600'
               }`}
             >
               {tab.label}
@@ -229,8 +224,8 @@ export default function Appointments() {
         {/* Appointments List */}
         {appointments.length === 0 ? (
           <Card className="text-center py-12">
-            <CalendarDaysIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">
+            <CalendarDaysIcon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
               No {activeTab} appointments found
             </p>
             {activeTab === 'upcoming' && (
@@ -250,12 +245,12 @@ export default function Appointments() {
                   exit={{ opacity: 0, x: -100 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <div className="flex flex-col md:flex-row gap-4">
+                  <Card className="hover:shadow-lg transition-shadow bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl border border-white/40 dark:border-slate-700">
+                    <div className="flex gap-3 sm:gap-4">
                       {/* Doctor Avatar */}
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-16 rounded-xl gradient-bg flex items-center justify-center">
-                          <span className="text-white text-xl font-bold">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl gradient-bg flex items-center justify-center">
+                          <span className="text-white text-lg sm:text-xl font-bold">
                             {appointment.doctor_name?.charAt(0) || 'D'}
                           </span>
                         </div>
@@ -265,10 +260,10 @@ export default function Appointments() {
                       <div className="flex-1">
                         <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                           <div>
-                            <h3 className="font-semibold text-gray-900">
+                            <h3 className="font-semibold text-gray-900 dark:text-white">
                               Dr. {appointment.doctor_name}
                             </h3>
-                            <p className="text-sm text-primary-600">
+                            <p className="text-sm text-primary-600 dark:text-primary-400">
                               {appointment.doctor_specialty}
                             </p>
                           </div>
@@ -282,7 +277,7 @@ export default function Appointments() {
                         </div>
                         
                         {/* Details */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300 mb-4">
                           <div className="flex items-center gap-2">
                             <CalendarDaysIcon className="w-4 h-4 text-gray-400" />
                             {format(
@@ -298,14 +293,15 @@ export default function Appointments() {
                         
                         {/* Symptoms */}
                         {appointment.patient_symptoms && (
-                          <div className="text-sm text-gray-500 mb-4">
+                          <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                             <span className="font-medium">Symptoms: </span>
                             {appointment.patient_symptoms}
                           </div>
                         )}
                         
                         {/* Cancellation Reason */}
-                        {appointment.status === 'CANCELLED' &&
+                        {(appointment.status === 'cancelled' ||
+                          appointment.status === 'CANCELLED') &&
                           appointment.cancellation_reason && (
                             <div className="text-sm text-red-500 mb-4">
                               <span className="font-medium">
@@ -343,7 +339,9 @@ export default function Appointments() {
                         )}
                         
                         {activeTab === 'past' &&
-                          appointment.status === 'COMPLETED' && (
+                          (appointment.status === 'completed' ||
+                            appointment.status === 'COMPLETED') &&
+                          !appointment.is_reviewed && (
                             <Button
                               variant="primary"
                               size="sm"
@@ -352,6 +350,15 @@ export default function Appointments() {
                             >
                               Leave a Review
                             </Button>
+                          )}
+                        {activeTab === 'past' &&
+                          (appointment.status === 'completed' ||
+                            appointment.status === 'COMPLETED') &&
+                          appointment.is_reviewed && (
+                            <span className="text-sm text-green-600 font-medium flex items-center gap-1">
+                              <StarIconSolid className="w-4 h-4" />
+                              Reviewed
+                            </span>
                           )}
                       </div>
                     </div>
@@ -376,14 +383,14 @@ export default function Appointments() {
       >
         <div className="space-y-4">
           {selectedAppointment && (
-            <div className="p-4 bg-red-50 rounded-lg">
+            <div className="p-4 bg-red-50 dark:bg-red-500/10 rounded-lg">
               <div className="flex items-start gap-3">
                 <ExclamationCircleIcon className="w-6 h-6 text-red-500 mt-0.5" />
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-gray-900 dark:text-white">
                     Are you sure you want to cancel this appointment?
                   </p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                     Dr. {selectedAppointment.doctor_name} •{' '}
                     {format(
                       parseISO(selectedAppointment.appointment_date),
@@ -397,14 +404,14 @@ export default function Appointments() {
           )}
           
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
               Reason for cancellation *
             </label>
             <textarea
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none dark:bg-slate-700 dark:text-white"
               placeholder="Please provide a reason..."
             />
           </div>
@@ -448,11 +455,11 @@ export default function Appointments() {
       >
         <div className="space-y-6">
           {selectedAppointment && (
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="font-medium text-gray-900">
+            <div className="p-4 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+              <p className="font-medium text-gray-900 dark:text-white">
                 Dr. {selectedAppointment.doctor_name}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {selectedAppointment.doctor_specialty}
               </p>
             </div>
@@ -460,7 +467,7 @@ export default function Appointments() {
 
           {/* Rating */}
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
               Rating *
             </label>
             <div className="flex gap-2">
@@ -494,28 +501,28 @@ export default function Appointments() {
 
           {/* Title */}
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
               Review Title (Optional)
             </label>
             <input
               type="text"
               value={reviewTitle}
               onChange={(e) => setReviewTitle(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none dark:bg-slate-700 dark:text-white"
               placeholder="e.g., Great experience!"
             />
           </div>
 
           {/* Comment */}
           <div>
-            <label className="text-sm font-medium text-gray-700 block mb-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
               Your Review *
             </label>
             <textarea
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none dark:bg-slate-700 dark:text-white"
               placeholder="Share your experience with this doctor..."
             />
           </div>

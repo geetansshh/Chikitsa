@@ -12,6 +12,7 @@ import { useAuthStore } from '@/stores/authStore'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
+import usePageTitle from '@/hooks/usePageTitle'
 import {
   EnvelopeIcon,
   LockClosedIcon,
@@ -53,6 +54,7 @@ interface Specialty {
 }
 
 export default function Register() {
+  usePageTitle('Create Account')
   const navigate = useNavigate()
   const { login } = useAuthStore()
   const requireDoctorVerification = import.meta.env.VITE_REQUIRE_DOCTOR_VERIFICATION === 'true'
@@ -231,17 +233,17 @@ export default function Register() {
           <div className="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4">
             <SparklesIcon className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create an account</h1>
-          <p className="text-gray-500 mt-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create an account</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
             Start your health journey with Chikitsa
           </p>
         </div>
         
-        <Card>
+        <Card className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-2xl border border-white/40 dark:border-slate-700 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 I am registering as
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -250,15 +252,15 @@ export default function Register() {
                   onClick={() => updateField('role', 'PATIENT')}
                   className={`p-4 border-2 rounded-lg transition-all ${
                     formData.role === 'PATIENT'
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10'
+                      : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                   }`}
                 >
                   <UserIcon className={`w-6 h-6 mx-auto mb-2 ${
-                    formData.role === 'PATIENT' ? 'text-primary-600' : 'text-gray-400'
+                    formData.role === 'PATIENT' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'
                   }`} />
                   <span className={`text-sm font-medium ${
-                    formData.role === 'PATIENT' ? 'text-primary-700' : 'text-gray-700'
+                    formData.role === 'PATIENT' ? 'text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'
                   }`}>
                     Patient
                   </span>
@@ -268,15 +270,15 @@ export default function Register() {
                   onClick={() => updateField('role', 'DOCTOR')}
                   className={`p-4 border-2 rounded-lg transition-all ${
                     formData.role === 'DOCTOR'
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10'
+                      : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                   }`}
                 >
                   <BriefcaseIcon className={`w-6 h-6 mx-auto mb-2 ${
-                    formData.role === 'DOCTOR' ? 'text-primary-600' : 'text-gray-400'
+                    formData.role === 'DOCTOR' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'
                   }`} />
                   <span className={`text-sm font-medium ${
-                    formData.role === 'DOCTOR' ? 'text-primary-700' : 'text-gray-700'
+                    formData.role === 'DOCTOR' ? 'text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'
                   }`}>
                     Doctor
                   </span>
@@ -284,7 +286,7 @@ export default function Register() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="First Name"
                 value={formData.firstName}
@@ -356,9 +358,9 @@ export default function Register() {
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-4 pt-4 border-t"
               >
-                <h3 className="text-sm font-semibold text-gray-900">Professional Information</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Professional Information</h3>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Specialty <span className="text-red-500">*</span>
@@ -366,8 +368,8 @@ export default function Register() {
                     <select
                       value={formData.specialtyId}
                       onChange={(e) => updateField('specialtyId', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                        errors.specialtyId ? 'border-red-500' : 'border-gray-300'
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-slate-700 dark:text-white ${
+                        errors.specialtyId ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
                       }`}
                     >
                       <option value="">Select specialty</option>
@@ -392,7 +394,7 @@ export default function Register() {
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Years of Experience"
                     type="number"
@@ -435,11 +437,11 @@ export default function Register() {
                     onChange={(e) => updateField('bio', e.target.value)}
                     placeholder="Brief description of your practice and expertise..."
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-slate-700 dark:text-white"
                   />
                 </div>
                 
-                <h3 className="text-sm font-semibold text-gray-900 pt-2">Clinic Information</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white pt-2">Clinic Information</h3>
                 
                 <Input
                   label="Clinic Name"
@@ -460,7 +462,7 @@ export default function Register() {
                   required
                 />
                 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <Input
                     label="City"
                     value={formData.clinicCity}
@@ -508,7 +510,7 @@ export default function Register() {
                   onChange={(e) => setAcceptTerms(e.target.checked)}
                   className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
                 />
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
                   I agree to the{' '}
                   <Link
                     to="/terms"
@@ -541,7 +543,7 @@ export default function Register() {
           </form>
           
           <div className="mt-6 text-center">
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               Already have an account?{' '}
               <Link
                 to="/login"

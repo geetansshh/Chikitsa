@@ -99,6 +99,9 @@ class Appointment(BaseModel):
     cancellation_reason = models.TextField(blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     
+    # Reminders
+    reminder_sent = models.BooleanField(default=False)
+    reminder_sent_at = models.DateTimeField(null=True, blank=True)
     
     # Managers
     objects = ActiveManager()
@@ -126,13 +129,15 @@ class Appointment(BaseModel):
         from django.utils import timezone
         from datetime import datetime
         
-        appointment_datetime = datetime.combine(
-            self.appointment_date,
-            datetime.strptime(self.time_slot, '%H:%M').time()
+        appointment_datetime = timezone.make_aware(
+            datetime.combine(
+                self.appointment_date,
+                datetime.strptime(self.time_slot, '%H:%M').time()
+            )
         )
         return (
-            appointment_datetime > timezone.now().replace(tzinfo=None) and
-            self.status in ['pending', 'confirmed']
+            appointment_datetime > timezone.now() and
+            self.status in [self.Status.PENDING, self.Status.CONFIRMED]
         )
     
     @property
@@ -141,12 +146,14 @@ class Appointment(BaseModel):
         from django.utils import timezone
         from datetime import datetime, timedelta
         
-        if self.status not in ['pending', 'confirmed']:
+        if self.status not in [self.Status.PENDING, self.Status.CONFIRMED]:
             return False
         
-        appointment_datetime = datetime.combine(
-            self.appointment_date,
-            datetime.strptime(self.time_slot, '%H:%M').time()
+        appointment_datetime = timezone.make_aware(
+            datetime.combine(
+                self.appointment_date,
+                datetime.strptime(self.time_slot, '%H:%M').time()
+            )
         )
         # Can cancel up to 2 hours before appointment
-        return appointment_datetime > timezone.now().replace(tzinfo=None) + timedelta(hours=2)
+        return appointment_datetime > timezone.now() + timedelta(hours=2)

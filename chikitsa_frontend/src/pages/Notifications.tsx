@@ -12,6 +12,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import { PageLoading } from '@/components/ui/LoadingSpinner'
+import usePageTitle from '@/hooks/usePageTitle'
 import {
   BellIcon,
   StarIcon,
@@ -33,9 +34,11 @@ interface Notification {
 interface SelectedNotificationData {
   notification: Notification
   doctorId: string
+  appointmentId: string
 }
 
 export default function Notifications() {
+  usePageTitle('Notifications')
   const queryClient = useQueryClient()
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [selectedNotification, setSelectedNotification] = useState<SelectedNotificationData | null>(null)
@@ -59,7 +62,7 @@ export default function Notifications() {
 
   // Submit review mutation
   const reviewMutation = useMutation({
-    mutationFn: async (data: { doctorId: string; data: { rating: number; title: string; comment: string } }) => {
+    mutationFn: async (data: { doctorId: string; data: { rating: number; title: string; comment: string; appointment_id: string } }) => {
       return doctorsAPI.createReview(data.doctorId, data.data)
     },
     onSuccess: () => {
@@ -99,7 +102,8 @@ export default function Notifications() {
           if (extractedDoctorId) {
             setSelectedNotification({
               notification,
-              doctorId: extractedDoctorId
+              doctorId: extractedDoctorId,
+              appointmentId: notification.related_object_id
             })
             setShowReviewModal(true)
           } else {
@@ -137,6 +141,7 @@ export default function Notifications() {
         rating: reviewRating,
         title: reviewTitle,
         comment: reviewComment,
+        appointment_id: selectedNotification?.appointmentId || '',
       },
     })
   }
@@ -152,20 +157,20 @@ export default function Notifications() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-            <BellIcon className="w-8 h-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+            <BellIcon className="w-7 h-7 sm:w-8 sm:h-8" />
             Notifications
           </h1>
-          <p className="text-gray-600">Stay updated with your appointments and activities</p>
+          <p className="text-gray-600 dark:text-gray-300">Stay updated with your appointments and activities</p>
         </motion.div>
 
         {/* Notifications List */}
         {notifications.length === 0 ? (
           <Card className="text-center py-12">
-            <BellIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No notifications yet</p>
+            <BellIcon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400">No notifications yet</p>
           </Card>
         ) : (
           <div className="space-y-3">
@@ -180,10 +185,10 @@ export default function Notifications() {
                   className="cursor-pointer"
                 >
                   <Card
-                    className={`hover:shadow-lg transition-all ${
+                    className={`hover:shadow-lg transition-all backdrop-blur-xl border border-white/40 dark:border-slate-700 ${
                       !notification.is_read
-                        ? 'bg-primary-50 border-primary-200'
-                        : 'bg-white'
+                        ? 'bg-primary-50/70 dark:bg-primary-500/10'
+                        : 'bg-white/50 dark:bg-slate-800/50'
                     }`}
                   >
                     <div className="flex items-start gap-4">
@@ -207,14 +212,14 @@ export default function Notifications() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-semibold text-gray-900">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">
                             {notification.title}
                           </h3>
                           {!notification.is_read && (
                             <span className="flex-shrink-0 w-2 h-2 bg-primary-500 rounded-full" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                           {notification.message}
                         </p>
                         <p className="text-xs text-gray-400 mt-2">
@@ -250,7 +255,7 @@ export default function Notifications() {
           <div className="space-y-6">
             {/* Star Rating */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Rating *
               </label>
               <div className="flex gap-2">
@@ -262,9 +267,9 @@ export default function Notifications() {
                     className="focus:outline-none transition-transform hover:scale-110"
                   >
                     {star <= reviewRating ? (
-                      <StarIconSolid className="w-10 h-10 text-yellow-400" />
+                      <StarIconSolid className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400" />
                     ) : (
-                      <StarIcon className="w-10 h-10 text-gray-300" />
+                      <StarIcon className="w-8 h-8 sm:w-10 sm:h-10 text-gray-300" />
                     )}
                   </button>
                 ))}
@@ -286,7 +291,7 @@ export default function Notifications() {
 
             {/* Review Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Review Title *
               </label>
               <input
@@ -294,14 +299,14 @@ export default function Notifications() {
                 value={reviewTitle}
                 onChange={(e) => setReviewTitle(e.target.value)}
                 placeholder="Summarize your experience"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                 maxLength={100}
               />
             </div>
 
             {/* Review Comment */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Your Review (Optional)
               </label>
               <textarea
@@ -309,7 +314,7 @@ export default function Notifications() {
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="Share details about your experience..."
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none dark:bg-slate-700 dark:text-white"
                 maxLength={500}
               />
               <p className="text-xs text-gray-500 mt-1">

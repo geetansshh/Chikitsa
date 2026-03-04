@@ -2,7 +2,7 @@
 Views for doctors app.
 """
 
-from rest_framework import generics, status, permissions, filters
+from rest_framework import generics, status, permissions, filters, serializers
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -254,28 +254,22 @@ class DoctorReviewListView(generics.ListAPIView):
 
 class DoctorReviewCreateView(generics.CreateAPIView):
     """
-    Create a review for a doctor.
+    Create a review for a completed appointment.
     """
     serializer_class = DoctorReviewCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
     
     def perform_create(self, serializer):
+        from apps.appointments.models import Appointment
+        
         doctor_id = self.kwargs['doctor_id']
         doctor = DoctorProfile.objects.get(id=doctor_id)
+        appointment_id = serializer.validated_data.pop('appointment_id')
+        appointment = Appointment.objects.get(id=appointment_id)
         
-        # Check if user has had an appointment with this doctor
-        from apps.appointments.models import Appointment
-        has_appointment = Appointment.objects.filter(
-            patient=self.request.user,
-            doctor=doctor,
-            status='completed'
-        ).exists()
-        
-        review = serializer.save(
+        serializer.save(
             doctor=doctor,
             patient=self.request.user,
-            is_verified=has_appointment
+            appointment=appointment,
+            is_verified=True,
         )
-        
-        # Update doctor's average rating
-        doctor.update_rating(review.rating)

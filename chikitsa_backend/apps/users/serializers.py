@@ -147,7 +147,12 @@ class CustomRegisterSerializer(RegisterSerializer):
             
             verification_required = settings.REQUIRE_DOCTOR_VERIFICATION
             doctor_data = self.cleaned_data.get('doctor_data', {})
-            specialty = Specialty.objects.get(id=doctor_data['specialty_id'])
+            try:
+                specialty = Specialty.objects.get(id=doctor_data['specialty_id'])
+            except Specialty.DoesNotExist:
+                raise serializers.ValidationError(
+                    {'specialty_id': 'Selected specialty does not exist.'}
+                )
             
             DoctorProfile.objects.create(
                 user=user,

@@ -20,13 +20,14 @@ export default function LoadingSpinner({
   }
   
   return (
-    <div className={clsx('flex items-center justify-center', className)}>
+    <div className={clsx('flex items-center justify-center', className)} role="status" aria-label="Loading">
       <div
         className={clsx(
-          'animate-spin rounded-full border-4 border-gray-200 border-t-primary-500',
+          'animate-spin rounded-full border-4 border-gray-200 dark:border-slate-600 border-t-primary-500',
           sizes[size]
         )}
       />
+      <span className="sr-only">Loading…</span>
     </div>
   )
 }
@@ -34,10 +35,10 @@ export default function LoadingSpinner({
 // Full page loading component
 export function PageLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-[calc(100vh-4.5rem)] flex items-center justify-center">
       <div className="text-center">
         <LoadingSpinner size="lg" />
-        <p className="mt-4 text-gray-500">Loading...</p>
+        <p className="mt-4 text-gray-500 dark:text-gray-400 text-sm sm:text-base">Loading...</p>
       </div>
     </div>
   )
