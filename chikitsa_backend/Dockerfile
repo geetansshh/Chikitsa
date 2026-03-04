@@ -7,7 +7,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8000
+# Make entrypoint executable
+RUN chmod +x entrypoint.sh
 
-# Default: dev server (overridden by render.yaml startCommand in production)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE ${PORT:-8000}
+
+# Production: entrypoint handles migrations + gunicorn on $PORT
+# For local docker-compose, CMD is overridden by docker-compose.yml command
+CMD ["./entrypoint.sh"]
