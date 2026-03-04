@@ -4,6 +4,7 @@ services:
     name: chikitsa-backend
     env: python
     region: oregon
+    rootDir: chikitsa_backend
     buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application"
     envVars:
@@ -24,9 +25,7 @@ services:
       - key: CORS_ALLOWED_ORIGINS
         sync: false
 
-  # PostgreSQL Database
-  - type: pserv
-    name: chikitsa-db
-    env: docker
+databases:
+  - name: chikitsa-db
     plan: free
-    repo: https://github.com/render-examples/postgresql
+    region: oregon
