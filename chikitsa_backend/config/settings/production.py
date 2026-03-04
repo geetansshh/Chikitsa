@@ -16,8 +16,10 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '.onrender.com').split(',')
 
 # Get CORS origins from environment
 cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
-if cors_origins:
-    CORS_ALLOWED_ORIGINS = cors_origins.split(',')
+if cors_origins == '*':
+    CORS_ALLOW_ALL_ORIGINS = True
+elif cors_origins:
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in cors_origins.split(',') if o.strip()]
 else:
     CORS_ALLOWED_ORIGINS = []
 
@@ -50,12 +52,9 @@ DATABASES = {
 # Email - Use actual SMTP in production
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Logging
+# Logging - use console on Render (no persistent disk on free tier)
 LOGGING['handlers']['file'] = {
-    'class': 'logging.handlers.RotatingFileHandler',
-    'filename': BASE_DIR / 'logs' / 'production.log',
-    'maxBytes': 1024 * 1024 * 5,  # 5 MB
-    'backupCount': 5,
+    'class': 'logging.StreamHandler',
     'formatter': 'verbose',
 }
 
