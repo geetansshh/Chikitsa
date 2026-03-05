@@ -2,9 +2,9 @@
  * Doctors listing page with search and filters.
  */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { doctorsAPI } from '@/lib/api'
 import Card from '@/components/ui/Card'
@@ -54,8 +54,17 @@ interface Doctor {
 export default function Doctors() {
   usePageTitle('Find Doctors')
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [selectedSpecialty, setSelectedSpecialty] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
+
+  // Debounce typing to avoid refetching on every keystroke.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, 300)
+    return () => window.clearTimeout(timer)
+  }, [search])
   
   // Fetch specialties
   const { data: specialtiesData } = useQuery({
@@ -64,20 +73,21 @@ export default function Doctors() {
   })
   
   // Fetch doctors
-  const { data: doctorsData, isLoading, error } = useQuery({
-    queryKey: ['doctors', search, selectedSpecialty, selectedCity],
+  const { data: doctorsData, isLoading, isFetching, error } = useQuery({
+    queryKey: ['doctors', debouncedSearch, selectedSpecialty, selectedCity],
     queryFn: () =>
       doctorsAPI.getDoctors({
-        search,
+        search: debouncedSearch,
         specialty: selectedSpecialty,
         city: selectedCity,
       }),
+    placeholderData: keepPreviousData,
   })
   
   const specialties = specialtiesData?.data || []
   const doctors = doctorsData?.data?.results || []
   
-  if (isLoading) return <PageLoading />
+  if (isLoading && !doctorsData) return <PageLoading />
   
   return (
     <div className="py-6 sm:py-8">
@@ -144,11 +154,14 @@ export default function Doctors() {
         </motion.div>
         
         {/* Results count */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between gap-4">
           <p className="text-gray-600 dark:text-gray-300">
             Showing <span className="font-semibold">{doctors.length}</span>{' '}
             doctors
           </p>
+          {isFetching && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Updating results...</p>
+          )}
         </div>
         
         {/* Doctors Grid */}
