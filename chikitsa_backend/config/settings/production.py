@@ -25,7 +25,8 @@ if cors_origins == '*':
 elif cors_origins:
     CORS_ALLOWED_ORIGINS = [o.strip() for o in cors_origins.split(',') if o.strip()]
 else:
-    CORS_ALLOWED_ORIGINS = []
+    # Keep local-like behavior if origin env is not configured yet.
+    CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -53,15 +54,8 @@ DATABASES = {
     'default': env.db('DATABASE_URL')
 }
 
-# Keep production auth flow aligned with local:
-# no external SMTP dependency for register/login.
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 # Logging - use console logging in containerized deployments
 LOGGING['handlers']['file'] = {
     'class': 'logging.StreamHandler',
     'formatter': 'verbose',
 }
-
-# Keep verification disabled to avoid blocking auth in deployments.
-ACCOUNT_EMAIL_VERIFICATION = 'none'
