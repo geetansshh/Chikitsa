@@ -11,8 +11,12 @@ DEBUG = False
 # Force SECRET_KEY from environment — crash if missing
 SECRET_KEY = os.environ['SECRET_KEY']
 
-# Get ALLOWED_HOSTS from environment
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Get ALLOWED_HOSTS from environment and include Render-assigned hostname.
+allowed_hosts = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
+render_hostname = os.getenv('RENDER_EXTERNAL_HOSTNAME', '').strip()
+if render_hostname and render_hostname not in allowed_hosts:
+    allowed_hosts.append(render_hostname)
+ALLOWED_HOSTS = allowed_hosts
 
 # Get CORS origins from environment
 cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
