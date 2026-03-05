@@ -64,4 +64,5 @@ LOGGING['handlers']['file'] = {
 }
 
 # AllAuth email verification policy (mandatory/optional/none)
-ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
+# Default to "none" so deployed behavior matches local no-email flow.
+ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'none')
