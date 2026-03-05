@@ -16,7 +16,7 @@ body {
 
 .dark body,
 html.dark body {
-  background-color: #0f172a;
+  background-color: #000000;
   color: #e2e8f0;
 }
 
@@ -42,11 +42,11 @@ html.dark body {
   }
   
   .card {
-    @apply bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 transition-all duration-200 hover:shadow-md;
+    @apply bg-white dark:bg-neutral-950 rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-6 transition-all duration-200 hover:shadow-md;
   }
   
   .input {
-    @apply w-full px-4 py-3 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white dark:bg-slate-700 dark:text-white dark:placeholder-gray-400;
+    @apply w-full px-4 py-3 border border-gray-200 dark:border-white/15 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all bg-white dark:bg-black dark:text-white dark:placeholder-gray-400;
   }
   
   .gradient-text {

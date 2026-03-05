@@ -45,11 +45,11 @@ export default function DoctorLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 relative">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/20 dark:from-black dark:via-black dark:to-black relative">
       {/* Decorative background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10" aria-hidden>
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/15 dark:bg-primary-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 -left-20 w-72 h-72 bg-orange-200/10 dark:bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/15 dark:bg-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-20 w-72 h-72 bg-orange-200/10 dark:bg-transparent rounded-full blur-3xl" />
       </div>
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
@@ -66,12 +66,12 @@ export default function DoctorLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white/80 dark:bg-slate-800/90 backdrop-blur-2xl shadow-lg border-r border-white/40 dark:border-slate-700 transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white/80 dark:bg-black/90 backdrop-blur-2xl shadow-lg border-r border-white/40 dark:border-white/10 transform transition-transform duration-300 lg:translate-x-0 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-6 border-b dark:border-slate-700">
+        <div className="h-16 flex items-center justify-between px-6 border-b dark:border-white/10">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">C</span>
@@ -80,14 +80,14 @@ export default function DoctorLayout() {
           </Link>
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="lg:hidden p-1 rounded hover:bg-gray-100 dark:hover:bg-slate-700"
+            className="lg:hidden p-1 rounded hover:bg-gray-100 dark:hover:bg-white/10"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
 
         {/* Doctor Info */}
-        <div className="p-4 border-b dark:border-slate-700">
+        <div className="p-4 border-b dark:border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center">
               <span className="text-white font-semibold">
@@ -117,8 +117,8 @@ export default function DoctorLayout() {
                 onClick={() => setIsSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
-                    ? 'bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                    ? 'bg-primary-50 dark:bg-white/10 text-primary-600 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
                 }`}
               >
                 <link.icon className="w-5 h-5" />
@@ -129,7 +129,7 @@ export default function DoctorLayout() {
         </nav>
 
         {/* Bottom Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t dark:border-slate-700">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t dark:border-white/10">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
@@ -143,10 +143,10 @@ export default function DoctorLayout() {
       {/* Main Content */}
       <div className="lg:ml-64">
         {/* Top Header */}
-        <header className="h-16 bg-white dark:bg-slate-800 shadow-sm dark:shadow-slate-900/50 flex items-center justify-between px-4 lg:px-8">
+        <header className="h-16 bg-white dark:bg-black border-b border-transparent dark:border-white/10 shadow-sm dark:shadow-black/40 flex items-center justify-between px-4 lg:px-8">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
           >
             <Bars3Icon className="w-6 h-6 dark:text-gray-200" />
           </button>
@@ -157,7 +157,7 @@ export default function DoctorLayout() {
             {/* Notifications */}
             <Link
               to="/doctor/notifications"
-              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
             >
               <BellIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
               {unreadCount > 0 && (

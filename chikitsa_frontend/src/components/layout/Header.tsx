@@ -67,7 +67,7 @@ export default function Header() {
   }, [isProfileOpen])
   
   return (
-    <header className="sticky top-0 z-50 bg-cream-50/60 dark:bg-slate-900/80 backdrop-blur-2xl border-b border-white/40 dark:border-slate-700/50 shadow-sm">
+    <header className="sticky top-0 z-50 bg-cream-50/60 dark:bg-black/80 backdrop-blur-2xl border-b border-white/40 dark:border-slate-700/50 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}

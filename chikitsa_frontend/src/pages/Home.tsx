@@ -61,7 +61,7 @@ export default function Home() {
   return (
     <div className="overflow-hidden">
       {/* ───── Hero Section ───── */}
-      <section className="relative pt-8 pb-16 lg:pt-12 lg:pb-24 bg-cream-50 dark:bg-slate-900">
+      <section className="relative pt-8 pb-16 lg:pt-12 lg:pb-24 bg-cream-50 dark:bg-black">
         <div className="container mx-auto px-4">
           {/* Heading area */}
           <div className="text-center max-w-5xl mx-auto mb-10 lg:mb-14">
@@ -205,7 +205,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link to="/register" className="w-full sm:w-auto">
-              <Button variant="ghost" size="lg" className="w-full sm:w-auto border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800">
+              <Button variant="ghost" size="lg" className="w-full sm:w-auto border border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
                 Get Started Free
               </Button>
             </Link>
@@ -214,7 +214,7 @@ export default function Home() {
       </section>
 
       {/* ───── Features Section ───── */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-white to-cream-100/50 dark:from-slate-900 dark:to-slate-800">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-white to-cream-100/50 dark:from-black dark:to-black">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -240,7 +240,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
-                className="group bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 hover:bg-primary-500 transition-all duration-300 border border-white/50 dark:border-slate-700 hover:border-primary-500 hover:shadow-xl shadow-lg"
+                className="group bg-white/40 dark:bg-black/40 backdrop-blur-xl rounded-2xl p-6 hover:bg-primary-500 transition-all duration-300 border border-white/50 dark:border-gray-800 hover:border-primary-500 hover:shadow-xl shadow-lg"
               >
                 <div className="w-12 h-12 bg-primary-100 dark:bg-primary-500/20 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-4 transition-colors">
                   <feature.icon className="w-6 h-6 text-primary-600 group-hover:text-white transition-colors" />

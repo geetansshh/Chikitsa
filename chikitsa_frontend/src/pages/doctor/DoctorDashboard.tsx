@@ -151,7 +151,7 @@ export default function DoctorDashboard() {
                 }) => (
                   <div
                     key={apt.id}
-                    className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors gap-3"
+                    className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-white/5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors gap-3"
                   >
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-100 dark:bg-primary-500/20 rounded-full flex items-center justify-center flex-shrink-0">
