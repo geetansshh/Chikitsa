@@ -59,3 +59,8 @@ LOGGING['handlers']['file'] = {
     'class': 'logging.StreamHandler',
     'formatter': 'verbose',
 }
+
+# Keep deployed auth flow simple and local-like:
+# no email verification barrier and no SMTP dependency.
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
