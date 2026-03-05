@@ -53,8 +53,9 @@ DATABASES = {
     'default': env.db('DATABASE_URL')
 }
 
-# Email - Use actual SMTP in production
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Email backend can be configured via env.
+# Keep a safe default so auth doesn't break when SMTP is not configured yet.
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
 # Logging - use console logging in containerized deployments
 LOGGING['handlers']['file'] = {
@@ -62,5 +63,5 @@ LOGGING['handlers']['file'] = {
     'formatter': 'verbose',
 }
 
-# AllAuth - Require email verification in production
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# AllAuth email verification policy (mandatory/optional/none)
+ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
