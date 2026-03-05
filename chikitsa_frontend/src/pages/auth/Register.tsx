@@ -158,25 +158,55 @@ export default function Register() {
     },
     onError: (error: {
       response?: {
-        data?: Record<string, string[]>
+        data?: {
+          error?: {
+            message?: string
+            details?: Record<string, string[] | string> | string[] | string
+          }
+        } & Record<string, unknown>
       }
     }) => {
-      const responseErrors = error.response?.data
-      if (responseErrors) {
+      const data = error.response?.data
+      const details = data?.error?.details ?? data
+
+      const mapFieldKey = (key: string) => {
+        if (key === 'non_field_errors' || key === 'detail') return 'general'
+        if (key === 'password1') return 'password'
+        if (key === 'password2') return 'confirmPassword'
+        if (key === 'first_name') return 'firstName'
+        if (key === 'last_name') return 'lastName'
+        if (key === 'license_number') return 'licenseNumber'
+        if (key === 'specialty_id') return 'specialtyId'
+        return key
+      }
+
+      if (details && typeof details === 'object' && !Array.isArray(details)) {
         const newErrors: Record<string, string> = {}
-        Object.entries(responseErrors).forEach(([key, messages]) => {
-          if (Array.isArray(messages)) {
-            if (key === 'password1') newErrors.password = messages[0]
-            else if (key === 'password2') newErrors.confirmPassword = messages[0]
-            else if (key === 'first_name') newErrors.firstName = messages[0]
-            else if (key === 'last_name') newErrors.lastName = messages[0]
-            else newErrors[key] = messages[0]
+        Object.entries(details).forEach(([key, value]) => {
+          if (Array.isArray(value) && value.length > 0) {
+            newErrors[mapFieldKey(key)] = String(value[0])
+          } else if (typeof value === 'string') {
+            newErrors[mapFieldKey(key)] = value
           }
         })
-        setErrors(newErrors)
-      } else {
-        toast.error('Registration failed. Please try again.')
+
+        if (Object.keys(newErrors).length > 0) {
+          setErrors(newErrors)
+          if (newErrors.general) toast.error(newErrors.general)
+          return
+        }
       }
+
+      if (Array.isArray(details) && details.length > 0) {
+        const message = String(details[0])
+        setErrors({ general: message })
+        toast.error(message)
+        return
+      }
+
+      const fallbackMessage = data?.error?.message || 'Registration failed. Please try again.'
+      setErrors({ general: fallbackMessage })
+      toast.error(fallbackMessage)
     },
   })
   
@@ -531,6 +561,12 @@ export default function Register() {
                 <p className="mt-1 text-sm text-red-500">{errors.terms}</p>
               )}
             </div>
+
+            {errors.general && (
+              <div className="p-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg">
+                <p className="text-sm text-red-600">{errors.general}</p>
+              </div>
+            )}
             
             <Button
               type="submit"

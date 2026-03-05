@@ -5,6 +5,7 @@ Serializers for the users app.
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.db import IntegrityError
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from django.conf import settings
 
@@ -84,6 +85,13 @@ class CustomRegisterSerializer(RegisterSerializer):
     
     def validate(self, data):
         data = super().validate(data)
+
+        # Ensure duplicate emails return a validation error (not DB 500).
+        email = (data.get('email') or '').strip().lower()
+        if email and User.objects.filter(email__iexact=email).exists():
+            raise serializers.ValidationError({
+                'email': ['An account with this email already exists. Please log in.']
+            })
         
         # If role is DOCTOR, ensure required doctor fields are provided
         if data.get('role') == User.Role.DOCTOR:
@@ -134,7 +142,22 @@ class CustomRegisterSerializer(RegisterSerializer):
         return data
     
     def save(self, request):
-        user = super().save(request)
+        try:
+            user = super().save(request)
+        except IntegrityError as exc:
+            error_text = str(exc).lower()
+            if 'users_user.email' in error_text or 'account_emailaddress' in error_text:
+                raise serializers.ValidationError({
+                    'email': ['An account with this email already exists. Please log in.']
+                })
+            if 'license_number' in error_text:
+                raise serializers.ValidationError({
+                    'license_number': ['This license number is already registered.']
+                })
+            raise serializers.ValidationError({
+                'non_field_errors': ['Registration failed due to duplicate data.']
+            })
+
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         user.phone = self.cleaned_data.get('phone', '')
