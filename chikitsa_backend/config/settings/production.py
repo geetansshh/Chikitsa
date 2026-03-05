@@ -11,8 +11,8 @@ DEBUG = False
 # Force SECRET_KEY from environment — crash if missing
 SECRET_KEY = os.environ['SECRET_KEY']
 
-# Get ALLOWED_HOSTS from environment or use Render default
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '.onrender.com').split(',')
+# Get ALLOWED_HOSTS from environment
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Get CORS origins from environment
 cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
@@ -52,7 +52,7 @@ DATABASES = {
 # Email - Use actual SMTP in production
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Logging - use console on Render (no persistent disk on free tier)
+# Logging - use console logging in containerized deployments
 LOGGING['handlers']['file'] = {
     'class': 'logging.StreamHandler',
     'formatter': 'verbose',
