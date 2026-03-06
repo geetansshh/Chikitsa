@@ -2,7 +2,7 @@
  * Login page.
  */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
@@ -24,12 +24,19 @@ export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuthStore()
+  const locationState = location.state as { from?: string; reason?: string } | null
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   
-  const fromLocation = (location.state as { from?: string })?.from
+  const fromLocation = locationState?.from
+
+  useEffect(() => {
+    if (locationState?.reason !== 'inactive') return
+    toast.error('You were logged out due to inactivity.')
+    navigate('/login', { replace: true, state: {} })
+  }, [locationState?.reason, navigate])
   
   const getRedirectPath = (userRole: string) => {
     // If there's a specific location to return to, use it

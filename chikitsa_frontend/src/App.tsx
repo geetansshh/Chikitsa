@@ -1,10 +1,12 @@
-import { Suspense, lazy } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Suspense, lazy, useCallback } from 'react'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import DoctorLayout from './components/layout/DoctorLayout'
 import { PageLoading } from './components/ui/LoadingSpinner'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { useAuthStore } from './stores/authStore'
+import useInactivityLogout from './hooks/useInactivityLogout'
+import toast from 'react-hot-toast'
 
 // Lazy-loaded pages — only downloaded when visited
 const Home = lazy(() => import('./pages/Home'))
@@ -44,6 +46,21 @@ function RoleBasedRedirect() {
 }
 
 function App() {
+  const navigate = useNavigate()
+  const { isAuthenticated, logout } = useAuthStore()
+
+  const handleAutoLogout = useCallback(() => {
+    logout()
+    toast.error('Session ended due to inactivity. Please login again.')
+    navigate('/login', { replace: true, state: { reason: 'inactive' } })
+  }, [logout, navigate])
+
+  useInactivityLogout({
+    enabled: isAuthenticated,
+    timeoutMs: 20 * 60 * 1000,
+    onTimeout: handleAutoLogout,
+  })
+
   return (
     <Suspense fallback={<PageLoading />}>
       <Routes>
