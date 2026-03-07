@@ -29,6 +29,7 @@ export default function Header() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const { isAuthenticated, user, logout } = useAuthStore()
   const location = useLocation()
+  const headerRef = useRef<HTMLElement>(null)
   
   // Fetch unread notification count
   const { data: unreadData } = useQuery({
@@ -55,19 +56,32 @@ export default function Header() {
 
   // Close profile dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: PointerEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setIsProfileOpen(false)
       }
     }
     if (isProfileOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('pointerdown', handleClickOutside)
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('pointerdown', handleClickOutside)
   }, [isProfileOpen])
+
+  // Close mobile menu on outside tap/click
+  useEffect(() => {
+    const handleOutsideMenuClick = (e: PointerEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false)
+      }
+    }
+    if (isMenuOpen) {
+      document.addEventListener('pointerdown', handleOutsideMenuClick)
+    }
+    return () => document.removeEventListener('pointerdown', handleOutsideMenuClick)
+  }, [isMenuOpen])
   
   return (
-    <header className="sticky top-0 z-50 bg-cream-50/60 dark:bg-black/80 backdrop-blur-2xl border-b border-white/40 dark:border-slate-700/50 shadow-sm">
+    <header ref={headerRef} className="sticky top-0 z-50 bg-cream-50/60 dark:bg-black/80 backdrop-blur-2xl border-b border-white/40 dark:border-slate-700/50 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}
